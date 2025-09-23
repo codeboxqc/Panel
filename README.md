@@ -172,7 +172,8 @@ Open a web browser (Chrome/Firefox).
 Go to: http://192.168.4.1
 You should see the "ESP32 Configuration" page with WiFi and Pin fields.
 
-![1](https://github.com/user-attachments/assets/8dbb01cc-ca5c-4c4f-b319-f3a1ead72b11)
+ ![11](https://github.com/user-attachments/assets/8cd0688f-fd29-48e3-bb45-1cc8998d98a2)
+
 
 Enter Configuration:
 
