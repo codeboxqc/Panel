@@ -3,19 +3,8 @@
 #include <math.h>
 
 #include "gfx.h"
- 
- 
-
-// ====================================================
-//  
-//  
-//  
-// ====================================================
-
-
-
-
-
+#include "firstboot.h" 
+  
 
 
 // Pin configuration - adjust these for your ESP32 setup
@@ -37,7 +26,7 @@
 
 MatrixPanel_I2S_DMA *dma_display;
 
-
+ 
 
 uint16_t palette[16] = {
   0x0000, // 0 - black
@@ -106,19 +95,46 @@ uint16_t palette256[256] = {
 };
 
 
-Flame flame;
-Plasma plasma;
-MatrixRain matrix;
-WaterRipple water;
-RadarScan radar;
+Flame flame={};
+Plasma plasma={};
+MatrixRain matrix={};
+RadarScan radar={};
 
 
 
 
+float fade = 1.0f; // Start fully visible
+ 
+    // Array of pointers to the image arrays
+unsigned char *images[] = {  i1, i2, i3, i4, i5, i6, i7, i8, i9, i10, i11, i12, i13, i14, i15 };
 
+void bubble(int q);
+void pacman(int q);
 
+extern void checkResetButton();
+extern void resetConfig();
 
+void fbootPIN() { int i=0;
 
+ // Initialize first boot configuration
+    i=initFirstBoot();
+    
+    // Wait for configuration to complete
+    while (!isConfigComplete()) {
+        if(i==1) break;
+         else handleFirstBoot();
+    }
+    
+    // Get configured pins
+    MatrixPins matrixPins = getMatrixPins();
+    
+    // Create HUB75 configuration
+    HUB75_I2S_CFG::i2s_pins _pins = matrixPins.getPinsConfig();
+    HUB75_I2S_CFG mxconfig(PANEL_RES_X, PANEL_RES_Y, PANEL_CHAIN, _pins);
+    
+    // Initialize matrix
+    dma_display = new MatrixPanel_I2S_DMA(mxconfig);
+}
 
 
 // ====================================================
@@ -127,21 +143,32 @@ RadarScan radar;
 void setup() {
   Serial.begin(115200);
 
+  /*
   // Configure HUB75 pins
   HUB75_I2S_CFG::i2s_pins _pins = {
     R1_PIN,G1_PIN,B1_PIN,R2_PIN,G2_PIN,B2_PIN,
     A_PIN,B_PIN,C_PIN,D_PIN,E_PIN,LAT_PIN,OE_PIN,CLK_PIN
   };
 
-  HUB75_I2S_CFG mxconfig(PANEL_RES_X, PANEL_RES_Y, PANEL_CHAIN, _pins);
+   HUB75_I2S_CFG mxconfig(PANEL_RES_X, PANEL_RES_Y, PANEL_CHAIN, _pins);
 
   // Initialize display
   dma_display = new MatrixPanel_I2S_DMA(mxconfig);
+
+  */
+
+
+   fbootPIN();
+
+
+   //resetConfig();
+
+
   dma_display->begin();
   dma_display->setBrightness8(100);
   dma_display->clearScreen();
 
-randomSeed(analogRead(A0));
+//randomSeed(analogRead(A0));
 
  
 
@@ -149,47 +176,27 @@ randomSeed(analogRead(A0));
 
 //putimagesize(1, 1, i1,  32);
 
+//i8 face test
+//putimage(0, 0, i2); //20
+bubble(0);
+//delay(1000);
 
-putimage(0, 0, i20);
-  
+
+ 
+
  inittime();
  initFlame(&flame);
  initPlasma(&plasma);
  initStarfield();
  initMatrixRain(&matrix);
- initWaterRipple( &water);
-initParticleSystem();
-  initRadarScan() ;
+ initParticleSystem();
+ initRadarScan() ;
+
 }
 
  
 
-// Array of pointers to the image arrays
-unsigned char *images[23] = {  i1, i2, i3, i4, i5, i6, i7, i8, i9, i10, i11, i12, i13, i14, i15, i16, i17, i18, i19, i20, i21, i22,i23};
-float fade = 1.0f; // Start fully visible
- 
 
-void bubble(int q) {
-    int bob = random(0, 23);  // Random index for 23 images (0 to 22)
-    dma_display->clearScreen();
-
-    if(q==0) putimage(0, 1, images[bob]);  // Display the selected image at (1, 1)
-
-    if(q==1) { for(int i=0;i<50;i++ ) { putimageFade(0, 1,  images[bob],fade); fade -= 0.02f; 
-                             delay(33);
-                 }}
-
-    if(q==2) {  
-                    putimageColorMap(0, 1, images[bob] ,palette[random(1,16)]); 
-                    
-               }
-
-    if(q==3) { putimageInvert(0, 1, images[bob]); }
-
-    if(q!=1) delay(5000);
-     
-    dma_display->clearScreen();
-}
 
  
 
@@ -201,46 +208,72 @@ void bubble(int q) {
  
  
 unsigned long stateStartTime = 0;
-const unsigned long showTimeDuration = 3UL * 60UL * 1000UL;  // 3 minutes
+const unsigned long showTimeDuration = 2UL * 60UL * 1000UL;  // 2 minutes
 const unsigned long animInterval = 3UL * 60UL * 1000UL;    //  15 minutes
 const unsigned long hourInterval = 58UL * 60UL * 1000UL;     // 60 minutes
 unsigned long st =0;
 uint8_t currentAnimation = 0;
 bool showTime = false;  // Tracks whether to show time or animation
+bool hasShownThisHour = false;  // Flag to prevent showing multiple times per hour
 
-float Jets=0.0;
+float Jets=0.0f;
 
 void loop() {
     unsigned long now = millis();
 
-    // Check if it's time to show the clock (every hour)
-    if (now - stateStartTime >= hourInterval) {
-        showTime = true;  // Switch to showing time
-        stateStartTime = now;  // Reset state start time
-        currentAnimation = random(0, 25);  // Pick a new animation for after the time display
+    checkResetButton();
+
+
+    // Get current time
+    struct tm timeinfo;
+    if (!getLocalTime(&timeinfo)) {
+        // If we can't get time, fall back to original behavior
+        if (now - stateStartTime >= 60UL * 60UL * 1000UL) { // 60 minutes
+            showTime = true;
+            stateStartTime = now;
+            currentAnimation = random(0, 25);
+            hasShownThisHour = false;
+        }
+    } else {
+        // Check if it's a new hour (minutes are 0 and we haven't shown time this hour)
+        if (timeinfo.tm_min == 59 && !hasShownThisHour) {
+            showTime = true;
+            stateStartTime = now;
+            currentAnimation = random(0, 25);  // Pick animation for after time display
+            hasShownThisHour = true;
+        }
+        
+        // Reset the flag when we're past minute 0
+        if (timeinfo.tm_min != 59) {
+            hasShownThisHour = false;
+        }
     }
+    
     // Check if the 3-minute time display is over
-    else if (showTime && now - stateStartTime >= showTimeDuration) {
+    if (showTime && now - stateStartTime >= showTimeDuration) {
         showTime = false;  // Switch back to animations
         stateStartTime = now;  // Reset state start time
     }
-    // Check if it's time to change animation (every 15 minutes, only when not showing time)
-    else if (!showTime && now - stateStartTime >= animInterval) {
-        currentAnimation = random(0, 13);  // Pick a new animation
+    
+    // Check if it's time to change animation (every 3 minutes, only when not showing time)
+    if (!showTime && now - stateStartTime >= animInterval) {
+        currentAnimation = random(0, 25);  // Pick a new animation
         stateStartTime = now;  // Reset state start time
-
-        int i=random(0,3);
-        bubble(i);  
+        
+        int i = random(0, 3);
+        bubble(i);
+        
         fade = 1.0f;
-        //Jets=0.0f;
+        //Jets = 0.0f;
     }
 
-
-    //currentAnimation=25;  //test
+//19
+    // currentAnimation=10;  //test
 
     // Execute the appropriate state
     if (showTime) {
-        time(1, 15);  // Draw current time
+        time(1, 18);  // Draw current time
+        dma_display->clearScreen();
     } else {
         switch (currentAnimation) {
             case 0:
@@ -279,7 +312,7 @@ void loop() {
                 
 
             case 5: //////////////////
-                 vortexEffect(millis());
+                pacman(0);
                 break;
 
             case 6:
@@ -309,10 +342,8 @@ void loop() {
                 delay(33);
                 break;
 
-            case 10:
-                 st = millis();
-                while (millis() - st < 1000) vortexEffect16(millis());
-                //delay(10);
+            case 10:///////////////////////////////
+                  pacman(0);
                 break;
 
             case 11:
@@ -322,27 +353,18 @@ void loop() {
                   //dma_display->clearScreen();
                 break;
 
-            case 12:
-                updateWaterRipple(&water);
-                drawWaterRipple(&water);
-                // Add some interactive ripples based on time
-                static uint32_t last_interaction = 0;
-                if (millis() - last_interaction > 2000) {
-                    addRippleAt(&water, random(WIDTH), random(HEIGHT));
-                    last_interaction = millis();
-                }
-                delay(33);
+               case 12://////////////////////////////////////
+                 bubble(random(0,4));
+                
                 break;
 
                  case 13://orange fall
                  fireAnimation(millis());
                  break;
 
-                  case 14: 
-                  
-                    switchFractalPlasma(millis());
-                  
-                 break;
+                  case 14: ///////////////???slow
+                     switchFractalPlasma(millis());
+                       break;
 
                   case 15:
                   fastFractalPlasma(millis());
@@ -354,7 +376,11 @@ void loop() {
                  break;
 
                  case 17:
-                 vanGoghPaintAnimation(millis());
+                  
+                 
+                 
+                  vanGoghPaintAnimation(millis() );
+                  
                  break;
 
                  case 18:
@@ -364,7 +390,7 @@ void loop() {
                  break;
 
                  case 19:
-                 Pivotal(Jets);
+                 Pivotal(Jets);//////////////////slow
                  Jets += 0.03;                  
                  break;
 
@@ -375,20 +401,24 @@ void loop() {
                  break;
                   
                  case 21:
-                       RadialGlow(Jets); 
-                       Jets += 0.03;
+                        RadialGlow(millis());
+                       
                   break;            
                        
 
                  case 22:
                        RaymarchGlow(Jets );
                        Jets += 0.03;
+                       delay(5);
                                    
                  break;
                        
                  case 23:
-                           SineChaosGlow(Jets );
-                       Jets += 0.03;        
+                          
+
+                      TronMatrixPulse(Jets );
+                       Jets += 0.03;     
+                       delay(2);   
                  break;
 
                  case 24:
@@ -396,20 +426,9 @@ void loop() {
                  Jets += 0.03;
                  break;
 
-                 case 25:
                   
-   
-                 break;
 
-                 case 26:                    
-                 break;
-
-                 case 27:                    
-                 break;
-
-                 case 28:                    
-                 break;
-                  
+               
 
 
                  
@@ -417,7 +436,8 @@ void loop() {
 
             default:
                 // Fallback in case of invalid animation index
-                time(1, 15);  // Draw current time
+                time(1, 18);  // Draw current time
+                dma_display->clearScreen();
                 break;
         }
     }
@@ -425,17 +445,53 @@ void loop() {
 
  
   
-  
- 
- 
- 
- 
-
- 
-
+  ///////////////////////////////////////////////////////////////////////
 
 
  
+void bubble(int q) {
+
+    int bob = random(0, 16);  // Random index  image.cpp
+    dma_display->clearScreen();
+
+    if(q==0) putimage(0, 0, images[bob]);  // Display the selected image at (1, 1)
+
+    if(q==1) { for(int i=0;i<50;i++ ) { putimageFade(0, 1,  images[bob],fade); fade -= 0.02f; 
+                             delay(33);
+                 }}
+
+    if(q==2) {  
+               putimageColorMap(0, 0, images[bob] ,palette[random(1,16)]); 
+                    
+               }
+
+    if(q==3) { putimageInvert(0, 0, images[bob]); }
+
+    if(q!=1) delay(5000);
+     
+    dma_display->clearScreen();
 
 
- 
+   
+}
+
+
+
+void pacman(int q) {
+    int bob = random(0, 16); // Random image index
+    int x = -32, y = 15;
+    int prevX = x, prevY = y;
+
+    while (x < 100) {
+        
+        // Draw new image
+        y = 15 + random(0, 3);
+        putimagesize(x, y, images[bob], 32);
+        x++;
+        delay(33);
+         
+        dma_display->writeFillRect(x-1, y,32,32,0x000);
+       
+    }
+   
+}

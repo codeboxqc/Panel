@@ -31,14 +31,11 @@ extern unsigned char i12[2048];
 extern unsigned char i13[2048];
 extern unsigned char i14[2048];
 extern unsigned char i15[2048];
-extern unsigned char i16[2048];
-extern unsigned char i17[2048];
-extern unsigned char i18[2048];
-extern unsigned char i19[2048];
-extern unsigned char i20[2048];
-extern unsigned char i21[2048];
-extern unsigned char i22[2048];
-extern unsigned char i23[2048];
+ 
+ 
+ 
+ 
+ 
 
 extern MatrixPanel_I2S_DMA *dma_display;
  
@@ -108,24 +105,8 @@ typedef struct {
 #define HEIGHT 64
 #define WIDTH 64
 
-/////////////////////////////////////////////////////////////////
-// Water ripple structure
-typedef struct {
-  int16_t current[HEIGHT][WIDTH];
-  int16_t previous[HEIGHT][WIDTH];
-  uint32_t last_update;
-  uint8_t damping;
-  uint8_t ripple_intensity;
-  uint32_t last_ripple_time;
-  uint8_t color_mode;
-} WaterRipple;
-
-void initWaterRipple(WaterRipple* water);
-void updateWaterRipple(WaterRipple* water);
-void drawWaterRipple(WaterRipple* water);
-void addRippleAt(WaterRipple* water, int x, int y);
-/////////////////////////////////////////////////////////////////
-
+ 
+  
 
  /////////////////////////////////////////////////
 typedef struct {
@@ -142,8 +123,7 @@ void drawRadarScan();
 void updateRadarScan();
 void initRadarScan() ;
  ///////////////////////////////////////////////
-
-
+void draw3DCube(float centerX, float centerY, float scale, float rotX, float rotY, float rotZ, float t);
  ///////////////////////////////////
  //Modern Particle Wave Animation
 #define NUM_PARTICLES 12
@@ -199,7 +179,7 @@ void initPlasma(Plasma* plasma);
  void putimageRotate(int px, int py, const unsigned char* img, int degrees);
  void putimageInvert(int px, int py, const unsigned char* img) ;
  void putimageBlend(int px, int py, const unsigned char* img1, const unsigned char* img2, float blend) ;
-//{ // blend=0: img1, 1: img2
+ 
  
 
  void plasmaEffect(int px, int py, unsigned long timeOffset) ;
@@ -210,28 +190,29 @@ void initPlasma(Plasma* plasma);
 
  
  void plasmaEffect(unsigned long time);
- void vortexEffect(unsigned long time);
- void vortexEffect16(unsigned long time);
+  
+ 
  void pixelRainEffect(unsigned long time);
  void  Rain (unsigned long time);
  void rain16(unsigned long time);
 void plasmaEffect(int px, int py, unsigned long timeOffset);
- void vortexEffect256Simple(unsigned long time);
- void vortexEffect256Fast(unsigned long time);
+ 
  void matrixDigitalRain(unsigned long time);
 void fireAnimation(unsigned long time);
 void switchFractalPlasma(unsigned long time) ;
  void fastFractalPlasma(unsigned long time);
  void fastFractalMorph(unsigned long time);
- void vanGoghPaintAnimation(unsigned long time);
+void vanGoghPaintAnimation(unsigned long time );
 void Jetstream(float t);
 void Pivotal(float t);
 void Pillars(float t);
-void RadialGlow(float t);
+void RadialGlow(uint32_t time);
 void RaymarchGlow(float t);
-void SineChaosGlow(float t);
+ void TronMatrixPulse(float t);
 void GooGlow(float t) ;
 
+ void blue(float t);
 
+ 
 
 #endif

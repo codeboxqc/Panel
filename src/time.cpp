@@ -8,10 +8,12 @@
 // -------------------- Config --------------------
 const char* ntpServer = "pool.ntp.org";
 const char* timezone  = "EST5EDT,M3.2.0,M11.1.0"; // New York time
-const char* ssid      = "***";
-const char* password  = "***";
+ char* ssid      = "class";
+ char* password  = "class";
 
- 
+ String ssidGlob;
+ String  passwordGlob;
+
 int Tok=0;
 
 
@@ -118,8 +120,25 @@ unsigned char z9[]={    0,0,1,1,1,1,0,
 
  unsigned char* digits[10] = { z0, z1, z2, z3, z4, z5, z6, z7, z8, z9 };
 
+
+ 
+
+
 // -------------------- WiFi --------------------
 bool connectWiFi() {
+
+
+
+
+  if (ssidGlob.length() == 0)   return false;
+
+  // Convert String to char*
+  ssid =     (char*)  ssidGlob.c_str();     
+  password = (char*)  passwordGlob.c_str();
+
+  
+   
+
   WiFi.begin(ssid, password);
   int attempts = 0;
   while (WiFi.status() != WL_CONNECTED && attempts < 20) {

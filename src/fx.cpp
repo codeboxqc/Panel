@@ -67,7 +67,7 @@ void plasmaAnimation(unsigned long time) {
     }
 }
 
-
+//13
 void fireAnimation(unsigned long time) {
     static uint16_t heat[WIDTH][HEIGHT];
     static unsigned long lastUpdate = 0;
@@ -126,6 +126,9 @@ void fireAnimation(unsigned long time) {
         }
     }
 }
+
+
+
 
  void matrixDigitalRain(unsigned long time) {
     static int columns[WIDTH];
@@ -450,72 +453,6 @@ void  Rain (unsigned long time) {
         }
     }
 }
-
-
-void vortexEffect16(unsigned long time) {
-    float centerX = WIDTH / 2.0;
-    float centerY = HEIGHT / 2.0;
-    float timeFactor = time * 0.001;
-    
-    for (int x = 0; x < WIDTH; x++) {
-        for (int y = 0; y < HEIGHT; y++) {
-            // Calculate distance and angle from center
-            float dx = x - centerX;
-            float dy = y - centerY;
-            float distance = sqrt(dx*dx + dy*dy);
-            float angle = atan2(dy, dx);
-            
-            // Create swirling effect
-            float swirl = sin(distance * 0.1 - timeFactor * 2.0);
-            float pattern = sin(angle * 5.0 + distance * 0.2 - timeFactor * 3.0 + swirl);
-            
-            // Map to color
-            uint8_t col = (uint8_t)((pattern + 1.0) * 7.5) % 16;
-            dma_display->drawPixel(x, y, palette[col]);
-        }
-    }
-}
-// 4. Enhanced Vortex Effect with full color range
-void vortexEffect(unsigned long time) {
-    float centerX = WIDTH / 2.0;
-    float centerY = HEIGHT / 2.0;
-    float timeFactor = time * 0.001;
-    
-    for (int x = 0; x < WIDTH; x++) {
-        for (int y = 0; y < HEIGHT; y++) {
-            // Calculate distance and angle from center
-            float dx = x - centerX;
-            float dy = y - centerY;
-            float distance = sqrt(dx*dx + dy*dy);
-            float angle = atan2(dy, dx);
-            
-            // Create swirling effect with multiple layers
-            float swirl1 = sin(distance * 0.1 - timeFactor * 2.0);
-            float swirl2 = cos(angle * 3.0 + timeFactor * 1.5);
-            float pattern = sin(angle * 5.0 + distance * 0.2 - timeFactor * 3.0 + swirl1 + swirl2);
-            
-            // Map to HSV for smooth color transitions
-            float hue = fmod(angle / (2 * PI) + timeFactor * 0.2, 1.0);
-            float saturation = 0.8 + 0.2 * cos(timeFactor * 0.7);
-            float value = 0.5 + 0.5 * pattern;
-            
-            // Ensure values are in valid range
-            hue = fmod(hue + 1.0, 1.0);
-            saturation = fmax(0.0, fmin(1.0, saturation));
-            value = fmax(0.0, fmin(1.0, value));
-            
-            uint16_t color = hsvToRgb(hue, saturation, value);
-            dma_display->drawPixel(x, y, color);
-        }
-    }
-}
-
- 
-
-
-
-
-
 
 
 // ====================================================
@@ -844,177 +781,7 @@ void drawMatrixRain(MatrixRain* rain) {
 }
 
 
-
-
-// ====================================================
-// WaterRipple
-// ====================================================
-
-void initWaterRipple(WaterRipple* water) {
-  water->last_update = 0;
-  water->damping = 24;  // Higher damping for more realistic effect
-  water->ripple_intensity = 180;
-  water->last_ripple_time = 0;
-  water->color_mode = 0; // 0: Blue, 1: Multi-color, 2: Psychedelic
-  
-  // Clear buffers with more precision
-  for (int y = 0; y < HEIGHT; y++) {
-    for (int x = 0; x < WIDTH; x++) {
-      water->current[y][x] = 0;
-      water->previous[y][x] = 0;
-    }
-  }
-}
-
-void addRipple(WaterRipple* water, int x, int y, int intensity) {
-  if (x >= 1 && x < WIDTH-1 && y >= 1 && y < HEIGHT-1) {
-    water->previous[y][x] = intensity;
-    water->previous[y-1][x] = intensity * 0.7;
-    water->previous[y+1][x] = intensity * 0.7;
-    water->previous[y][x-1] = intensity * 0.7;
-    water->previous[y][x+1] = intensity * 0.7;
-  }
-}
-
-void updateWaterRipple(WaterRipple* water) {
-  uint32_t current_time = millis();
-  
-  // Add automatic ripples at random intervals
-  if (current_time - water->last_ripple_time > 800 + random(1200)) {
-    int x = 10 + random(WIDTH - 20);
-    int y = 10 + random(HEIGHT - 20);
-    addRipple(water, x, y, water->ripple_intensity);
-    water->last_ripple_time = current_time;
-  }
-  
-  // Add occasional random droplets
-  if (random(100) < 15) {
-    int x = random(WIDTH);
-    int y = random(HEIGHT);
-    addRipple(water, x, y, 80 + random(100));
-  }
-  
-  // Enhanced wave propagation with better physics
-  for (int y = 1; y < HEIGHT - 1; y++) {
-    for (int x = 1; x < WIDTH - 1; x++) {
-      // Improved wave equation with smoothing
-      int16_t new_value = (
-        water->previous[y-1][x] + 
-        water->previous[y+1][x] + 
-        water->previous[y][x-1] + 
-        water->previous[y][x+1] +
-        water->previous[y-1][x-1] * 0.7 +
-        water->previous[y-1][x+1] * 0.7 +
-        water->previous[y+1][x-1] * 0.7 +
-        water->previous[y+1][x+1] * 0.7
-      ) / 4 - water->current[y][x];
-      
-      // Apply damping with better curve
-      water->current[y][x] = new_value * (255 - water->damping) / 256;
-      
-      // Add slight random noise for more natural look
-      if (random(100) < 2) {
-        water->current[y][x] += random(-5, 6);
-      }
-    }
-  }
-  
-  // Handle edges with reflection
-  for (int y = 0; y < HEIGHT; y++) {
-    water->current[y][0] = water->current[y][1] * 0.8;
-    water->current[y][WIDTH-1] = water->current[y][WIDTH-2] * 0.8;
-  }
-  for (int x = 0; x < WIDTH; x++) {
-    water->current[0][x] = water->current[1][x] * 0.8;
-    water->current[HEIGHT-1][x] = water->current[HEIGHT-2][x] * 0.8;
-  }
-  
-  // Swap buffers
-  for (int y = 0; y < HEIGHT; y++) {
-    for (int x = 0; x < WIDTH; x++) {
-      int16_t temp = water->previous[y][x];
-      water->previous[y][x] = water->current[y][x];
-      water->current[y][x] = temp;
-    }
-  }
-}
-
-uint32_t getWaterColor(int16_t height, uint8_t color_mode) {
-  int16_t h = constrain(height + 128, 0, 255);
-  
-  switch (color_mode) {
-    case 1: // Multi-color mode
-      {
-        // Create rainbow effect based on height
-        uint8_t r, g, b;
-        if (h < 85) {
-          r = h * 3;
-          g = 0;
-          b = 255 - h * 3;
-        } else if (h < 170) {
-          r = 255;
-          g = (h - 85) * 3;
-          b = 0;
-        } else {
-          r = 255 - (h - 170) * 3;
-          g = 255;
-          b = (h - 170) * 3;
-        }
-        return dma_display->color565(r, g, b);
-      }
-      
-    case 2: // Psychedelic mode
-      {
-        uint32_t time = millis() / 50;
-        uint8_t r = (h + time) % 256;
-        uint8_t g = (h + time / 2) % 256;
-        uint8_t b = (h + time / 3) % 256;
-        return dma_display->color565(r, g, b);
-      }
-      
-    default: // Classic blue water mode
-      {
-        uint8_t intensity = abs(height) / 2;
-        uint8_t b = 64 + intensity;
-        uint8_t g = 32 + intensity / 2;
-        uint8_t r = intensity / 4;
-        
-        // Add specular highlights for more realistic water
-        if (height > 20) {
-          uint8_t highlight = min(255, (height - 20) * 3);
-          r = min(255, r + highlight / 2);
-          g = min(255, g + highlight / 2);
-          b = min(255, b + highlight);
-        }
-        
-        return dma_display->color565(r, g, b);
-      }
-  }
-}
-
-void drawWaterRipple(WaterRipple* water) {
-  for (int y = 0; y < HEIGHT; y++) {
-    for (int x = 0; x < WIDTH; x++) {
-      int16_t height = water->current[y][x];
-      uint32_t color = getWaterColor(height, water->color_mode);
-      dma_display->drawPixel(x, y, color);
-    }
-  }
-}
-
-// Function to change color mode
-void nextColorMode(WaterRipple* water) {
-  water->color_mode = (water->color_mode + 1) % 3;
-}
-
-// Function to add ripple at specific position (for interactivity)
-void addRippleAt(WaterRipple* water, int x, int y) {
-  addRipple(water, x, y, water->ripple_intensity);
-}
-  
-
-
-
+ 
 
 
 
@@ -1711,117 +1478,267 @@ void fastFractalMorph(unsigned long time) {
 
 
 ///////////////////////////////////
-void vanGoghPaintAnimation(unsigned long time) {
-    static int columns[WIDTH];
-    static int colSpeed[WIDTH];
-    static int colBrightness[WIDTH];
-    static unsigned long lastUpdate = 0;
-    static unsigned long lastSwirlChange = 0;
+// Predefined colors converted from hex to RGB tuples
+static const uint8_t colors[10][3] = {
+    {35, 87, 137},   // #235789
+    {193, 41, 46},   // #c1292e
+    {241, 211, 2},   // #f1d302
+    {255, 255, 255}, // #ffffff
+    {214, 122, 177}, // #d67ab1
+    {255, 140, 66},  // #ff8c42
+    {129, 193, 75},  // #81c14b
+    {46, 147, 60},   // #2e933c
+    {228, 87, 46},   // #e4572e
+    {23, 190, 187}   // #17bebb
+};
+
+// Easing function: easeInOutExpo
+float easeInOutExpo(float x) {
+    if (x == 0.0f) return 0.0f;
+    if (x == 1.0f) return 1.0f;
+    if (x < 0.5f) return powf(2.0f, 20.0f * x - 10.0f) / 2.0f;
+    return (2.0f - powf(2.0f, -20.0f * x + 10.0f)) / 2.0f;
+}
+ 
+// Helper function to draw filled rectangle optimized
+void drawFilledRect(int x, int y, int w, int h, uint16_t color) {
+    // Clamp to display bounds
+    if (x < 0) { w += x; x = 0; }
+    if (y < 0) { h += y; y = 0; }
+    if (x + w > WIDTH) w = WIDTH - x;
+    if (y + h > HEIGHT) h = HEIGHT - y;
     
-    if (time - lastUpdate > 100) { // Keep slow update for smooth, dreamy effect
+    if (w <= 0 || h <= 0) return;
+    
+    // Use display library's optimized rectangle drawing if available
+    for (int dy = 0; dy < h; dy++) {
+        for (int dx = 0; dx < w; dx++) {
+            dma_display->drawPixel(x + dx, y + dy, color);
+        }
+    }
+}
+
+void vanGoghPaintAnimation(unsigned long time) {
+    static unsigned long lastUpdate = 0;
+    static float offset = 0.0f;
+    static int drc[64] = {0};       // Direction for each cell (0-4)
+    static int pdrc[64] = {0};      // Previous direction
+    static float cx[64] = {0.0f};   // Current x center
+    static float cy[64] = {0.0f};   // Current y center
+    static float cx0[64] = {0.0f};  // Start x center
+    static float cy0[64] = {0.0f};  // Start y center
+    static float cx1[64] = {0.0f};  // Target x center
+    static float cy1[64] = {0.0f};  // Target y center
+    static float d[64] = {0.0f};    // Size of moving rectangle
+    static int t[64] = {0};         // Animation time
+    static const int t1 = 50;       // Animation duration (frames)
+    static uint16_t cols[64][4];    // Pre-converted colors for each cell
+    static bool initialized = false;
+    static bool needsFullRedraw = true;
+
+    // Initialize the grid (runs once)
+    if (!initialized) {
+        const int c = 8; // 8x8 grid
+        const float w = WIDTH / (float)c;
+        int idx = 0;
+        for (int i = 0; i < c; i++) {
+            for (int j = 0; j < c; j++) {
+                cx[idx] = i * w + w / 2.0f;
+                cy[idx] = j * w + w / 2.0f;
+                cx0[idx] = cx[idx];
+                cy0[idx] = cy[idx];
+                
+                // Randomize initial colors and pre-convert to 16-bit
+                int colorIndices[10] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+                for (int k = 9; k > 0; k--) {
+                    int swapIdx = rand() % (k + 1);
+                    int temp = colorIndices[k];
+                    colorIndices[k] = colorIndices[swapIdx];
+                    colorIndices[swapIdx] = temp;
+                }
+                for (int k = 0; k < 4; k++) {
+                    cols[idx][k] = dma_display->color565(
+                        colors[colorIndices[k]][0],
+                        colors[colorIndices[k]][1],
+                        colors[colorIndices[k]][2]
+                    );
+                }
+                idx++;
+            }
+        }
+        initialized = true;
+    }
+
+    // Update every 30ms for smooth animation
+    if (time - lastUpdate > 30) {
         lastUpdate = time;
-        
-        // Fade screen with semi-transparent dark blue overlay (Starry Night sky)
-        for (int x = 0; x < WIDTH; x++) {
-            for (int y = 0; y < HEIGHT; y++) {
-                if (random(100) < 20) { // 20% chance to fade to dark blue
-                    dma_display->drawPixel(x, y, dma_display->color565(0, random(10, 30), random(50, 80)));
-                }
-            }
-        }
-        
-        // Update swirling "brushstrokes" occasionally
-        if (time - lastSwirlChange > 300) { // Slower updates for brushstroke changes
-            lastSwirlChange = time;
+        offset += 0.02f;
+
+        // Only clear screen on first frame or when needed
+        if (needsFullRedraw) {
             for (int x = 0; x < WIDTH; x++) {
-                if (random(100) < 10) { // 10% chance to add new stroke
-                    int yPos = 0; // Start at top for downward motion
-                    // Starry Night colors: bright yellows, whites, or blues
-                    uint8_t r = random(100) < 30 ? random(150, 255) : 0; // Yellow/white or blue
-                    uint8_t g = random(100) < 30 ? random(150, 255) : random(10, 50);
-                    uint8_t b = random(100) < 70 ? random(100, 200) : random(50, 100);
-                    // Draw a "brushstroke" (cluster of pixels)
-                    dma_display->drawPixel(x, yPos, dma_display->color565(r, g, b));
-                    // Simulate Van Gogh's swirling strokes with adjacent pixels
-                    if (yPos < HEIGHT-1) dma_display->drawPixel(x, yPos+1, dma_display->color565(r*0.8, g*0.8, b*0.8));
-                    if (x > 0) dma_display->drawPixel(x-1, yPos, dma_display->color565(r*0.7, g*0.7, b*0.7));
-                    if (x < WIDTH-1) dma_display->drawPixel(x+1, yPos, dma_display->color565(r*0.7, g*0.7, b*0.7));
+                for (int y = 0; y < HEIGHT; y++) {
+                   // dma_display->drawPixel(x, y, 0); // Black background
                 }
             }
+            needsFullRedraw = false;
         }
-        
-        // Update columns for downward swirling movement
-        for (int x = 0; x < WIDTH; x++) {
-            if (random(100) < 5) { // 5% chance to start new downward swirl
-                columns[x] = 0; // Start at top
-                colSpeed[x] = random(1, 3); // Slower movement for downward flow
-                colBrightness[x] = random(150, 256); // Brighter for vivid colors
-            }
-            
-            if (columns[x] < HEIGHT) {
-                // Draw head of the swirl in Starry Night colors
-                uint8_t r = random(100) < 30 ? colBrightness[x] : 0; // Yellow/white or blue
-                uint8_t g = random(100) < 30 ? colBrightness[x] : colBrightness[x] * 0.3;
-                uint8_t b = random(100) < 70 ? colBrightness[x] : colBrightness[x] * 0.5;
+
+        const int c = 8;
+        const float w = WIDTH / (float)c;
+        int idx = 0;
+        bool anyMovementStarted = false;
+
+        for (int i = 0; i < c; i++) {
+            for (int j = 0; j < c; j++) {
+                float prevCx = cx[idx];
+                float prevCy = cy[idx];
                 
-                // Add sinusoidal swirl effect with downward motion
-                int xOffset = sin((float)columns[x] / 8.0) * 3; // Increased swirl amplitude
-                int xPos = x + xOffset;
-                if (xPos >= 0 && xPos < WIDTH) {
-                    dma_display->drawPixel(xPos, columns[x], dma_display->color565(r, g, b));
+                // Update movement
+                if (t[idx] >= 0 && t[idx] < t1) {
+                    float n = t[idx] / (float)t1;
+                    cx[idx] = cx0[idx] + (cx1[idx] - cx0[idx]) * easeInOutExpo(n);
+                    cy[idx] = cy0[idx] + (cy1[idx] - cy0[idx]) * easeInOutExpo(n);
                 }
-                
-                // Draw fading, wavy trail to mimic brushstrokes
-                for (int i = 1; i < 8; i++) {
-                    if (columns[x] - i >= 0) {
-                        uint8_t intensity = colBrightness[x] - (i * 20);
-                        if (intensity > 20) {
-                            // Apply swirl to trail with slight variation
-                            int trailXOffset = sin((float)(columns[x] - i) / 8.0) * 3;
-                            int trailXPos = x + trailXOffset;
-                            if (trailXPos >= 0 && trailXPos < WIDTH) {
-                                dma_display->drawPixel(trailXPos, columns[x] - i, dma_display->color565(r * (intensity/255.0), g * (intensity/255.0), b * (intensity/255.0)));
-                            }
-                        }
+                if (t[idx] >= t1) {
+                    // Initialize new movement
+                    pdrc[idx] = drc[idx];
+                    do {
+                        drc[idx] = rand() % 5;
+                    } while (drc[idx] == pdrc[idx]);
+                    d[idx] = w * ((rand() % 35 + 40) / 100.0f); // Random 0.4 to 0.75
+                    if (drc[idx] == 0) {
+                        cx1[idx] = i * w + w / 2.0f + (w / 2.0f - d[idx] / 2.0f);
+                        cy1[idx] = j * w + w / 2.0f + (w / 2.0f - d[idx] / 2.0f);
+                    } else if (drc[idx] == 1) {
+                        cx1[idx] = i * w + w / 2.0f - (w / 2.0f - d[idx] / 2.0f);
+                        cy1[idx] = j * w + w / 2.0f + (w / 2.0f - d[idx] / 2.0f);
+                    } else if (drc[idx] == 2) {
+                        cx1[idx] = i * w + w / 2.0f + (w / 2.0f - d[idx] / 2.0f);
+                        cy1[idx] = j * w + w / 2.0f - (w / 2.0f - d[idx] / 2.0f);
+                    } else if (drc[idx] == 3) {
+                        cx1[idx] = i * w + w / 2.0f - (w / 2.0f - d[idx] / 2.0f);
+                        cy1[idx] = j * w + w / 2.0f - (w / 2.0f - d[idx] / 2.0f);
+                    } else if (drc[idx] == 4) {
+                        cx1[idx] = i * w + w / 2.0f;
+                        cy1[idx] = j * w + w / 2.0f;
+                    }
+                    cx0[idx] = cx[idx];
+                    cy0[idx] = cy[idx];
+                    t[idx] = 0;
+                    anyMovementStarted = true;
+                }
+                t[idx]++;
+
+                // Only redraw this cell if position changed significantly or movement just started
+                if (abs((int)cx[idx] - (int)prevCx) > 0 || abs((int)cy[idx] - (int)prevCy) > 0 || anyMovementStarted || needsFullRedraw) {
+                    // Clear the cell area first (draw background)
+                    int cellX = (int)(i * w);
+                    int cellY = (int)(j * w);
+                    int cellW = (int)w + 1; // Add 1 to prevent gaps
+                    int cellH = (int)w + 1;
+                    
+                    // Clear cell background
+                    drawFilledRect(cellX, cellY, cellW, cellH, 0);
+                    
+                    // Calculate rectangle positions
+                    float xx = i * w + w / 2.0f - w / 2.0f;
+                    float yy = j * w + w / 2.0f - w / 2.0f;
+                    float ww = cx[idx] - xx;
+                    float hh = cy[idx] - yy;
+                    float off = w * 0.1f;
+
+                    // Draw four rectangles using optimized rectangle drawing
+                    // Top-left rectangle
+                    int x1 = (int)(xx + off / 2);
+                    int y1 = (int)(yy + off / 2);
+                    int w1 = (int)(ww - off / 2);
+                    int h1 = (int)(hh - off / 2);
+                    if (w1 > 0 && h1 > 0) {
+                        drawFilledRect(x1, y1, w1, h1, cols[idx][0]);
+                    }
+
+                    // Top-right rectangle
+                    int x2 = (int)(xx + ww + off / 2);
+                    int y2 = (int)(yy + off / 2);
+                    int w2 = (int)(w - ww - off);
+                    int h2 = (int)(hh - off);
+                    if (w2 > 0 && h2 > 0) {
+                        drawFilledRect(x2, y2, w2, h2, cols[idx][1]);
+                    }
+
+                    // Bottom-right rectangle
+                    int x3 = (int)(cx[idx] + off / 2);
+                    int y3 = (int)(cy[idx] + off / 2);
+                    int w3 = (int)(w - ww - off);
+                    int h3 = (int)(w - hh - off);
+                    if (w3 > 0 && h3 > 0) {
+                        drawFilledRect(x3, y3, w3, h3, cols[idx][2]);
+                    }
+
+                    // Bottom-left rectangle
+                    int x4 = (int)(xx + off / 2);
+                    int y4 = (int)(yy + hh + off / 2);
+                    int w4 = (int)(ww - off);
+                    int h4 = (int)(w - hh - off);
+                    if (w4 > 0 && h4 > 0) {
+                        drawFilledRect(x4, y4, w4, h4, cols[idx][3]);
                     }
                 }
                 
-                columns[x] += colSpeed[x]; // Move downward
-                colBrightness[x] = max(50, colBrightness[x] - 3); // Slower dimming
-            } else {
-                columns[x] = -random(10, 30); // Reset at top with random delay
+                idx++;
             }
         }
     }
 }
 
 
-
-
-
+  
 
 
  
+
+
+ 
+
 void Jetstream(float t) {
-  for (int y = 0; y < 64; y++) {
-    for (int x = 0; x < 64; x++) {
-      float fx = (float)x / 64.0;
-      float fy = (float)y / 64.0;
+ 
+  
+  const int W = 64, H = 64;
+  const int numLines = 36;
+  const float radius = 28.0f;
+  const float centerX = W / 2;
+  const float centerY = H / 2;
 
-      // Simulate swirling jetstream pattern
-      float dx = fx - 0.5;
-      float dy = fy - 0.5;
-      float dist = sqrt(dx * dx + dy * dy);
-      float angle = atan2(dy, dx) + t * 0.5;
-      float wave = sin(10.0 * dist - t * 2.0 + angle);
+   dma_display->fillScreen(0);
 
-      // Color modulation
-      uint8_t r = (uint8_t)(128 + 127 * sin(wave + t));
-      uint8_t g = (uint8_t)(128 + 127 * sin(wave + t + 2));
-      uint8_t b = (uint8_t)(128 + 127 * sin(wave + t + 4));
+  for (int i = 0; i < numLines; i++) {
+    float angle = (TWO_PI / numLines) * i + t * 0.5f;
+    float x1 = centerX + radius * cosf(angle);
+    float y1 = centerY + radius * sinf(angle);
+    float x2 = centerX + radius * cosf(angle + PI);
+    float y2 = centerY + radius * sinf(angle + PI);
 
-     dma_display->drawPixel(x, y,dma_display->color565(r, g, b));
-    }
+    // Color cycling
+    uint8_t hue = (uint8_t)((i * 7 + t * 40)) % 256;
+    uint8_t r = sinf(hue * 0.024f + 0.0f) * 127 + 128;
+    uint8_t g = sinf(hue * 0.024f + 2.0f) * 127 + 128;
+    uint8_t b = sinf(hue * 0.024f + 4.0f) * 127 + 128;
+    uint16_t color = dma_display->color565(r, g, b);
+
+     dma_display->drawPixel((int)x1/2+16, (int)y1/2+16,color );
+   
+
+    // Draw radial line (approximate midpoint blend)
+    int mx = (int)((x1 + x2) / 2);
+    int my = (int)((y1 + y2) / 2);
+    dma_display->drawPixel((int)x1, (int)y1, color);
+    dma_display->drawPixel((int)x2, (int)y2, color);
+
+    
+
+    dma_display->drawPixel(mx, my, color);
+     
   }
 }
 
@@ -1855,168 +1772,305 @@ void Pivotal(float t) {
 
 
 void Pillars(float t) {
-  for (int y = 0; y < 64; y++) {
-    for (int x = 0; x < 64; x++) {
-      // Normalize coordinates
-      float px = (float)x / 64.0;
-      float py = (float)y / 64.0;
+    const float invSize = 1.0f / 64.0f;
+    const float scale = 1.0f / 0.3f;
+    const float speed = 2.0f / PI;
 
-      // Transform to pillar space
-      float nx = (px * 2.0 - 1.0) / 0.3 + t * (2.0 / PI);
-      float ny = (py * 2.0 - 1.0) / 0.3 + t;
+    for (int y = 0; y < 64; y++) {
+        float py = (float)y * invSize;
+        float nyBase = (py * 2.0f - 1.0f) * scale + t;
 
-      // Modulo for repeating columns
-      float wx = fmod(nx, 2.0) - 1.0;
+        for (int x = 0; x < 64; x++) {
+            float px = (float)x * invSize;
+            float nx = (px * 2.0f - 1.0f) * scale + t * speed;
 
-      // Avoid sqrt domain error
-      float arc = sqrt(fmax(0.0, 1.0 - wx * wx));
+            float ny = nyBase;
+            float wx = fmodf(nx, 2.0f) - 1.0f;
 
-      // Phase shift per column
-      float phase = ny - arc * cos(ceil(nx * 0.5) * PI);
+            float arc = sqrtf(fmaxf(0.0f, 1.0f - wx * wx));
 
-      // Color modulation
-      uint8_t r = (uint8_t)(127 + 128 * sin(phase));
-      uint8_t g = (uint8_t)(127 + 128 * sin(phase + 1.0));
-      uint8_t b = (uint8_t)(127 + 128 * sin(phase + 2.0));
+            float phase = ny - arc * cosf(ceilf(nx * 0.5f) * PI);
 
-      dma_display->drawPixel(x, y, dma_display->color565(r, g, b));
+            // Extra colorful cycling
+            float hueShift = t * 2.0f;  // faster shifting
+            uint8_t r = (uint8_t)(127 + 128 * sinf(phase + hueShift * 0.7f));
+            uint8_t g = (uint8_t)(127 + 128 * sinf(phase + 2.0f + hueShift * 1.1f));
+            uint8_t b = (uint8_t)(127 + 128 * sinf(phase + 4.0f + hueShift * 1.7f));
+
+            dma_display->drawPixel(x, y, dma_display->color565(r, g, b));
+        }
     }
-  }
 }
+
 
 
   
-void RadialGlow(float t) {
-  for (int y = 0; y < 64; y++) {
-    for (int x = 0; x < 64; x++) {
-      // Normalize coordinates to center
-      float fx = (float)x / 64.0;
-      float fy = (float)y / 64.0;
-      float nx = (fx * 2.0 - 1.0);
-      float ny = (fy * 2.0 - 1.0);
-
-      // Apply matrix transformation (approximate mat4x2)
-      float tx = nx * -0.8 + ny * 0.4 + t * 0.1;
-      float ty = nx * 0.7 + ny * -0.7 + t * 0.1;
-
-      // Radial fade
-      float dotVal = tx * tx + ty * ty;
-      float glow = sqrt(fmax(0.0, 0.9 - dotVal));
-
-      // Color modulation
-      uint8_t r = (uint8_t)(128 + 127 * sin(glow + t));
-      uint8_t g = (uint8_t)(128 + 127 * sin(glow + t + 2));
-      uint8_t b = (uint8_t)(128 + 127 * sin(glow + t + 4));
-
-      dma_display->drawPixel(x, y, dma_display->color565(r, g, b));
-    }
-  }
-}
-
-
-
-
-
-
-void RaymarchGlow(float t) {
-  float centerX = 32.0;
-  float centerY = 32.0;
-
-  for (int y = 0; y < 64; y++) {
-    for (int x = 0; x < 64; x++) {
-      // Normalize coordinates
-      float fx = (x - centerX) / 32.0;
-      float fy = (y - centerY) / 32.0;
-
-      // Rotation
-      float angle = t * 0.5;
-      float cosA = cos(angle);
-      float sinA = sin(angle);
-
-      float rx = fx * cosA - fy * sinA;
-      float ry = fx * sinA + fy * cosA;
-
-      // Distance field (approximate shape)
-      float d = fmax(fmax(fabs(rx), fabs(ry)), fabs(rx + ry)) - 0.5;
-
-      // Glow intensity
-      float glow = fmax(0.0, 1.0 - d * 4.0);
-
-      // Rim lighting (simulate dot product, adjusted for stronger effect)
-      float rim = pow(fmax(0.0, rx * 0.0 + ry * 0.0 + 1.0), 3.0); // Increased exponent for sharper rim
-
-      // Starry Night-inspired color palette
-      // Base color oscillates with time for dynamic effect
-      float colorPhase = sin(t * 0.3 + rx * 0.5 + ry * 0.5) * 0.5 + 0.5; // Smooth oscillation
-      uint8_t r, g, b;
-      if (colorPhase < 0.4) { // Deep blues (Starry Night sky)
-        r = (uint8_t)((random(0, 50) / 25) * 25); // ~2 bits for low red
-        g = (uint8_t)((random(50, 100) / 25) * 25); // ~3 bits
-        b = (uint8_t)((random(100, 200) / 25) * 25); // ~3 bits
-      } else if (colorPhase < 0.8) { // Bright yellows (stars)
-        r = (uint8_t)((random(200, 256) / 36) * 36); // ~3 bits
-        g = (uint8_t)((random(200, 256) / 36) * 36); // ~3 bits
-        b = (uint8_t)((random(50, 100) / 25) * 25); // ~3 bits
-      } else { // Whites (bright highlights)
-        r = (uint8_t)((random(200, 256) / 36) * 36); // ~3 bits
-        g = (uint8_t)((random(200, 256) / 36) * 36); // ~3 bits
-        b = (uint8_t)((random(200, 256) / 36) * 36); // ~3 bits
-      }
-
-      // Modulate with glow and rim for luminosity
-      r = (uint8_t)(r * glow * rim * 0.9 + 20); // Add slight base intensity
-      g = (uint8_t)(g * glow * rim * 0.8 + 20);
-      b = (uint8_t)(b * glow * rim * 0.7 + 20);
-
-      // Clamp and quantize for 256-color palette
-      r = (r / 36) * 36; // Snap to ~3 bits
-      g = (g / 36) * 36; // Snap to ~3 bits
-      b = (b / 25) * 25; // Snap to ~3 bits
-
-      dma_display->drawPixel(x, y, dma_display->color565(r, g, b));
-    }
-  }
-}
-
-
-
- void SineChaosGlow(float t) {
+void RadialGlow(uint32_t time) {
   const int W = 64, H = 64;
-  const float scale = 0.1;
+  static uint8_t heat[W][H];
+  static uint32_t lastUpdate = 0;
+
+  if (time - lastUpdate < 30) return;
+  lastUpdate = time;
+
+  // Seed edges
+  for (int x = 0; x < W; x++) {
+    heat[x][0] = 180 + (rand() & 75); // Faster than random(180, 256)
+    heat[x][H - 1] = 180 + (rand() & 75);
+  }
+  for (int y = 0; y < H; y++) {
+    heat[0][y] = 180 + (rand() & 75);
+    heat[W - 1][y] = 180 + (rand() & 75);
+  }
+
+  // Propagate inward with stronger central fade
+  for (int x = 1; x < W - 1; x++) {
+    for (int y = 1; y < H - 1; y++) {
+      int avg = (heat[x - 1][y] + heat[x + 1][y] + heat[x][y - 1] + heat[x][y + 1]) >> 2;
+      int dx = x < W/2 ? x : W - 1 - x;
+      int dy = y < H/2 ? y : H - 1 - y;
+      int dist = (dx + dy) >> 1; // Simplified distance approximation
+      int atten = (255 - dist * 25) * (255 - dist * 25) >> 8; // Quadratic falloff for center fade
+      heat[x][y] = (avg * atten >> 8) + ((rand() & 31) - 15); // Faster random noise
+      if (heat[x][y] > 255) heat[x][y] = 255;
+      if (heat[x][y] < 0) heat[x][y] = 0;
+    }
+  }
+
+  // Draw pixels
+  for (int x = 0; x < W; x++) {
+    for (int y = 0; y < H; y++) {
+      uint8_t v = heat[x][y];
+      if (v > 30) { // Skip low-intensity pixels
+        uint16_t r = (v * 5) >> 2; // Faster multiplication
+        uint16_t g = (v * 4) / 5;
+        uint16_t b = v / 10;
+        if (r > 255) r = 255;
+        if (g > 200) g = 200;
+        if (b > 50) b = 50;
+        dma_display->drawPixel(x, y, dma_display->color565(r, g, b));
+      } else {
+        dma_display->drawPixel(x, y, 0); // Clear dim pixels for fade effect
+      }
+    }
+  }
+
+  // Corner bursts
+  if ((rand() % 100) < 15) {
+    int c = rand() & 3;
+    int sx = (c & 1) ? W - 3 : 0;
+    int sy = (c & 2) ? H - 3 : 0;
+    for (int x = sx; x < sx + 3; x++) {
+      for (int y = sy; y < sy + 3; y++) {
+        heat[x][y] = 200 + (rand() & 55); // Faster random
+      }
+    }
+  }
+}
+
+ 
+
+
+
+float lerp(float a, float b, float amt) {
+  return a + (b - a) * amt;
+}
+
+
+void RaymarchGlow(float t) { 
+  const int W = 64, H = 64;
+  const int grid = 6;
+  const int maxForms = grid * grid;
+  const float cellSize = W / grid;
+
+  static bool initialized = false;
+  static struct Form {
+    float x, y, d, r, s, ang;
+    int n, t;
+    uint16_t c0[6], cc[6], dcl;
+  } forms[maxForms];
+
+  if (!initialized) {
+    for (int i = 0; i < grid; i++) {
+      for (int j = 0; j < grid; j++) {
+        int idx = i * grid + j;
+        float x = i * cellSize + cellSize / 2;
+        float y = j * cellSize + cellSize / 2;
+        int n = 2 + rand() % 5;
+        forms[idx] = {x, y, cellSize * 0.75f, cellSize * 0.375f, cellSize * 0.3f, 0.0f, n, -60};
+
+        for (int k = 0; k < n; k++) {
+          uint8_t h = rand() % 256;
+          uint8_t r = sin(h * 0.024f + 0.0f) * 127 + 128;
+          uint8_t g = sin(h * 0.024f + 2.0f) * 127 + 128;
+          uint8_t b = sin(h * 0.024f + 4.0f) * 127 + 128;
+          forms[idx].c0[k] = dma_display->color565(r, g, b);
+          forms[idx].cc[k] = forms[idx].c0[k];
+        }
+
+        uint8_t h = rand() % 256;
+        uint8_t r = sin(h * 0.024f + 0.0f) * 127 + 128;
+        uint8_t g = sin(h * 0.024f + 2.0f) * 127 + 128;
+        uint8_t b = sin(h * 0.024f + 4.0f) * 127 + 128;
+        forms[idx].dcl = dma_display->color565(r, g, b);
+      }
+    }
+    initialized = true;
+  }
+
+  dma_display->fillScreen(0);
+
+  for (int i = 0; i < maxForms; i++) {
+    Form &f = forms[i];
+    int t1 = 30, t2 = t1 + 40, t3 = t2 + 30, t4 = t3 + 60;
+
+    // Animate
+    if (f.t > 0 && f.t < t1) {
+      float amt = (float)(f.t) / (t1 - 1);
+      float ease = amt * amt * amt;
+      f.ang = ease * TWO_PI;
+      f.r = lerp(f.d / 2, 0, ease);
+    }
+    if (f.t > t1 && f.t < t2) {
+      float amt = (float)(f.t - t1) / (t2 - t1 - 1);
+      float ease = pow(2, -10 * amt) * sin((amt * 10 - 0.75f) * ((2 * PI) / 3)) + 1;
+      f.s = lerp(f.d * 0.3f, f.d * 0.5f, ease);
+    }
+    if (f.t > t3 && f.t < t4) {
+      float amt = (float)(f.t - t3) / (t4 - t3 - 1);
+      float ease = pow(2, -10 * amt) * sin((amt * 10 - 0.75f) * ((2 * PI) / 3)) + 1;
+      f.s = lerp(f.d * 0.5f, f.d * 0.3f, ease);
+      f.r = lerp(0, f.d / 2, ease);
+    }
+    if (f.t > t4) f.t = -60;
+    f.t++;
+
+    // Draw
+    for (int k = 0; k < f.n; k++) {
+      float a = (TWO_PI / f.n) * k + f.ang;
+      int px = (int)(f.x + f.r * cosf(a));
+      int py = (int)(f.y + f.r * sinf(a));
+      dma_display->drawPixel(px, py, f.cc[k]);
+    }
+  }
+}
+
+
+ 
+ void blue(float t) { //blue
+  const int W = 64, H = 64;
+  const float speed = 0.15;
+  const float glowFreq = 0.3;
+  const float pulseFreq = 0.05;
 
   for (int y = 0; y < H; y++) {
     for (int x = 0; x < W; x++) {
-      // Normalize coordinates to [-1, 1]
-      float px = (2.0 * x - W) / H;
-      float py = (2.0 * y - H) / H;
+      // Grid-aligned coordinates
+      float gx = x * glowFreq;
+      float gy = y * glowFreq;
 
-      // Warp coordinates
-      float denom = 3.0 - py;
-      float fx = px / scale / denom + t;
-      float fy = py / scale / denom + t;
+      // Time-based pulse
+      float pulse = sin(t * speed + gx + gy);
 
-      // Nested sine chaos
-      float sx = fx + sin(fy * 3.0);
-      float sy = fy + sin(fx * 3.0);
-      float dotVal = ceil(sx) * 17.0 + ceil(sy) * 79.0;
-      float wave = sin(sin(dotVal) * 7000.0);
+      // Glow mask: radial + grid interference
+      float glow = sin(gx * 2.0 + t) * cos(gy * 2.0 - t);
+      glow *= sin((x + y) * pulseFreq + t * 2.0);
 
-      // Color modulation
-      float r = wave + 0.5;
-      float g = sin(sin(dotVal) * 7000.0 + 1.0) + 0.5;
-      float b = sin(sin(dotVal) * 7000.0 + 2.0) + 0.5;
+      // Composite brightness
+      float brightness = fmax(0.0, glow * pulse);
 
-      // Clamp and convert
-      uint8_t R = (uint8_t)(fmin(1.0, fmax(0.0, r)) * 255);
-      uint8_t G = (uint8_t)(fmin(1.0, fmax(0.0, g)) * 255);
-      uint8_t B = (uint8_t)(fmin(1.0, fmax(0.0, b)) * 255);
+      // Stylized color: neon green-blue fade
+      uint8_t R = 0;
+      uint8_t G = (uint8_t)(brightness * 255);
+      uint8_t B = (uint8_t)(brightness * (128 + sin(t + x * 0.1) * 127));
 
       dma_display->drawPixel(x, y, dma_display->color565(R, G, B));
     }
   }
 }
+
  
+  void TronMatrixPulse(float t) {
+  
+  const int W = 64, H = 64;
+  const int MAX_TYPES = 3;
+  const int MAX_POINTS = 8;
+  const float maxSpeed = 0.5;
+  const float influence = 0.02;
+
+  static bool initialized = false;
+  static struct Point {
+    float x, y, dx, dy;
+    uint16_t color;
+  } points[MAX_TYPES][MAX_POINTS];
+
+  // Initialize once
+  if (!initialized) {
+    for (int type = 0; type < MAX_TYPES; type++) {
+      uint8_t r = sin(type * 1.2) * 127 + 128;
+      uint8_t g = sin(type * 1.2 + 2.0) * 127 + 128;
+      uint8_t b = sin(type * 1.2 + 4.0) * 127 + 128;
+      uint16_t c = dma_display->color565(r, g, b);
+
+      for (int i = 0; i < MAX_POINTS; i++) {
+        points[type][i] = {
+          (float)(rand() % W),
+          (float)(rand() % H),
+          0.0f,
+          0.0f,
+          c
+        };
+      }
+    }
+    initialized = true;
+  }
+
+  dma_display->fillScreen(0); // Clear panel
+
+  for (int type = 0; type < MAX_TYPES; type++) {
+    for (int i = 0; i < MAX_POINTS; i++) {
+      Point &p = points[type][i];
+      float fx = 0, fy = 0;
+
+      for (int j = 0; j < MAX_POINTS; j++) {
+        if (i == j) continue;
+        Point &other = points[type][j];
+        float dx = other.x - p.x;
+        float dy = other.y - p.y;
+        float dist = sqrtf(dx * dx + dy * dy) + 0.001;
+        fx += dx / dist;
+        fy += dy / dist;
+      }
+
+      // Apply influence
+      p.dx += fx * influence;
+      p.dy += fy * influence;
+
+      // Limit speed
+      float mag = sqrtf(p.dx * p.dx + p.dy * p.dy);
+      if (mag > maxSpeed) {
+        p.dx *= maxSpeed / mag;
+        p.dy *= maxSpeed / mag;
+      }
+
+      // Update position
+      p.x += p.dx;
+      p.y += p.dy;
+
+      // Wrap around
+      if (p.x < 0) p.x += W;
+      if (p.x >= W) p.x -= W;
+      if (p.y < 0) p.y += H;
+      if (p.y >= H) p.y -= H;
+
+      // Draw pixel
+      dma_display->drawPixel((int)p.x, (int)p.y, p.color);
+       
+    }
+  }
  
+
+}
 
 void GooGlow(float t) {
   const int W = 64, H = 64;
@@ -2054,4 +2108,163 @@ void GooGlow(float t) {
   }
 }
 
+
+
+
+
+
+
+
+
+
+
+//////////////////////////////////////////////////////////////////////
  
+
+// Predefined RGB color palettes
+static const uint8_t colorPalettes[6][3][3] = {
+    {{255, 80, 80}, {80, 255, 80}, {80, 80, 255}},     // RGB Primary
+    {{255, 140, 0}, {255, 20, 147}, {0, 255, 255}},   // Sunset
+    {{50, 205, 50}, {255, 215, 0}, {255, 69, 0}},     // Forest Fire
+    {{138, 43, 226}, {255, 20, 147}, {0, 191, 255}},  // Cosmic
+    {{255, 105, 180}, {255, 215, 0}, {50, 205, 50}},  // Neon
+    {{255, 99, 71}, {255, 215, 0}, {72, 209, 204}}    // Tropical
+};
+
+void drawParametricCurves(unsigned long time) {
+    static unsigned long lastUpdate = 0;
+    static float t = 0.0f;
+    static int currentCurve = 0;
+    static int currentPalette = 0;
+    static unsigned long lastCurveChange = 0;
+    
+    // Update every 50ms for smooth animation
+    if (time - lastUpdate > 50) {
+        lastUpdate = time;
+        t += 0.03f;
+        
+        // Change curve every 8 seconds
+        if (time - lastCurveChange > 8000) {
+            currentCurve = (currentCurve + 1) % 6;
+            currentPalette = random(6);
+            lastCurveChange = time;
+        }
+    }
+    
+    // Clear display
+    for (int x = 0; x < WIDTH; x++) {
+        for (int y = 0; y < HEIGHT; y++) {
+            dma_display->drawPixel(x, y, 0);
+        }
+    }
+    
+    float centerX = WIDTH / 2.0f;
+    float centerY = HEIGHT / 2.0f;
+    float maxRadius = min(WIDTH, HEIGHT) * 0.4f;
+    int resolution = 300;
+    
+    // Draw the selected curve
+    for (int i = 0; i < resolution; i++) {
+        float theta = (float)i * TWO_PI * 4.0f / resolution;
+        float x, y;
+        
+        // Calculate curve point based on selected curve type
+        switch (currentCurve) {
+            case 0: { // Spiral Rose
+                float r = maxRadius * (0.6f + 0.3f * sin(theta * 0.5f + t));
+                x = r * cos(theta) * (1.0f + 0.3f * sin(7.0f * theta + t));
+                y = r * sin(theta) * (1.0f + 0.3f * cos(5.0f * theta - t));
+                break;
+            }
+            case 1: { // Lissajous
+                float scale = maxRadius * 0.8f;
+                x = scale * sin(3.0f * theta + t * 1.2f) * cos(2.0f * theta - t * 0.7f);
+                y = scale * cos(4.0f * theta - t * 0.9f) * sin(5.0f * theta + t * 1.1f);
+                break;
+            }
+            case 2: { // Hypotrochoid
+                float a = maxRadius * 0.6f, b = maxRadius * 0.2f;
+                x = (a + b) * cos(theta) - b * cos((a/b + 1.0f) * theta + t);
+                y = (a + b) * sin(theta) - b * sin((a/b + 1.0f) * theta + t);
+                break;
+            }
+            case 3: { // Fractal Wave
+                float wave = maxRadius * (0.5f + 0.3f * sin(theta * 2.0f + t * 0.2f));
+                x = wave * cos(theta) * (1.0f + 0.4f * sin(7.0f * theta + t * 0.3f));
+                y = wave * sin(theta) * (1.0f + 0.4f * cos(7.0f * theta - t * 0.3f));
+                break;
+            }
+            case 4: { // 3D Twisted Torus
+                float torus = maxRadius * (0.5f + 0.2f * sin(theta * 4.0f + t));
+                x = torus * cos(theta) + maxRadius/4.0f * sin(6.0f * theta + t);
+                y = torus * sin(theta) - maxRadius/4.0f * cos(6.0f * theta - t);
+                break;
+            }
+            case 5: { // Butterfly
+                float bt = theta + t * 0.5f;
+                float r = maxRadius * 0.6f * (exp(sin(bt)) - 2.0f * cos(4.0f * bt) + pow(sin(bt/12.0f), 5.0f));
+                x = r * sin(bt);
+                y = r * cos(bt);
+                break;
+            }
+        }
+        
+        // Convert to screen coordinates
+        int screenX = (int)(centerX + x);
+        int screenY = (int)(centerY + y);
+        
+        // Boundary check
+        if (screenX >= 0 && screenX < WIDTH && screenY >= 0 && screenY < HEIGHT) {
+            // Calculate color based on position and time
+            float colorPhase = (theta / (TWO_PI * 4.0f)) * 3.0f + t * 0.5f;
+            int colorIndex = ((int)colorPhase) % 3;
+            float blend = colorPhase - (int)colorPhase;
+            
+            // Get current palette
+            uint8_t r1 = colorPalettes[currentPalette][colorIndex][0];
+            uint8_t g1 = colorPalettes[currentPalette][colorIndex][1];
+            uint8_t b1 = colorPalettes[currentPalette][colorIndex][2];
+            
+            uint8_t r2 = colorPalettes[currentPalette][(colorIndex + 1) % 3][0];
+            uint8_t g2 = colorPalettes[currentPalette][(colorIndex + 1) % 3][1];
+            uint8_t b2 = colorPalettes[currentPalette][(colorIndex + 1) % 3][2];
+            
+            // Interpolate colors
+            uint8_t r = (uint8_t)(r1 + (r2 - r1) * blend);
+            uint8_t g = (uint8_t)(g1 + (g2 - g1) * blend);
+            uint8_t b = (uint8_t)(b1 + (b2 - b1) * blend);
+            
+            // Add brightness modulation
+            float brightness = 0.7f + 0.3f * sin(theta * 3.0f + t * 2.0f);
+            r = (uint8_t)(r * brightness);
+            g = (uint8_t)(g * brightness);
+            b = (uint8_t)(b * brightness);
+            
+            uint16_t color = dma_display->color565(r, g, b);
+            dma_display->drawPixel(screenX, screenY, color);
+            
+            // Add glow effect (draw neighboring pixels with reduced intensity)
+            if (i % 3 == 0) { // Only every 3rd point to avoid overcrowding
+                uint16_t glowColor = dma_display->color565(r/3, g/3, b/3);
+                for (int dx = -1; dx <= 1; dx++) {
+                    for (int dy = -1; dy <= 1; dy++) {
+                        int glowX = screenX + dx;
+                        int glowY = screenY + dy;
+                        if (glowX >= 0 && glowX < WIDTH && glowY >= 0 && glowY < HEIGHT &&
+                            (dx != 0 || dy != 0)) {
+                            dma_display->drawPixel(glowX, glowY, glowColor);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    
+  
+    }
+ 
+ 
+
+     //////////////////////////
+      

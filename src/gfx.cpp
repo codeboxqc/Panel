@@ -114,49 +114,9 @@ void putimagesize(int px, int py, const unsigned char* img, int size) {
     }
 }
 
-void putimagesize2(int px, int py, const unsigned char* img, int size) {
-    if (size <= 0 || size > PANEL_RES_Y) return;
-    for (int y = 0; y < size; y++) {
-        int screenY = py + y;
-        if (screenY < 0 || screenY >= PANEL_RES_Y) continue;
-        for (int x = 0; x < size; x++) {
-            int screenX = px + x;
-            if (screenX < 0 || screenX >= PANEL_RES_X) continue;
-            // Use 3x3 block for 20x20 (approx 3.2x3.2)
-            float scale = 64.0f / size;
-            int startX = (int)(x * scale);
-            int startY = (int)(y * scale);
-            int endX = startX + 3; // Fixed 3x3 block
-            int endY = startY + 3;
-            if (endX > 64) endX = 64;
-            if (endY > 64) endY = 64;
-            uint32_t rSum = 0, gSum = 0, bSum = 0, count = 0;
-            for (int sy = startY; sy < endY; sy++) {
-                for (int sx = startX; sx < endX; sx++) {
-                    int idx = sy * 64 + sx;
-                    uint8_t col = getPixel(img, idx);
-                    if (col != 0) { // Exclude black pixels
-                        uint16_t rgb565 = palette[col];
-                        rSum += ((rgb565 >> 11) & 0x1F) << 3;
-                        gSum += ((rgb565 >> 5) & 0x3F) << 2;
-                        bSum += (rgb565 & 0x1F) << 3;
-                        count++;
-                    }
-                }
-            }
-            uint8_t col = (count > 0) ? findClosestColor(rSum / count, gSum / count, bSum / count) : 0;
-            // Debug output for first few pixels
-            if (x < 5 && y == 0 && count > 0) {
-                Serial.print("Pixel ("); Serial.print(x); Serial.print(",0): RGB=");
-                Serial.print(rSum/count); Serial.print(",");
-                Serial.print(gSum/count); Serial.print(",");
-                Serial.print(bSum/count); Serial.print(" -> col="); Serial.println(col);
-            }
-            if (col != 0) dma_display->drawPixel(screenX, screenY, palette[col]);
-        }
-    }
-}
-
+ 
+ 
+ 
 // ====================================================
 // Color swap for non-zero pixels
 // ====================================================
@@ -175,7 +135,7 @@ void putimageColorMap(int px, int py, const unsigned char* img, int color){
         }
     }
 }
-
+ 
 // ====================================================
 // Fade in/out image
 // fade = 0.0 (black) -> 1.0 (full brightness)
@@ -205,29 +165,7 @@ void putimageFade(int px, int py, const unsigned char* img, float fade){
     }
 }
 
-
-void putimageRotate(int px, int py, const unsigned char* img, int degrees) {
-    degrees = degrees % 360;
-    int rot = degrees / 90; // 0=0°, 1=90°, 2=180°, 3=270°
-    for (int y = 0; y < 64; y++) {
-        int screenY = py + y;
-        if (screenY < 0 || screenY >= PANEL_RES_Y) continue;
-        for (int x = 0; x < 64; x++) {
-            int screenX = px + x;
-            if (screenX < 0 || screenX >= PANEL_RES_X) continue;
-            int origX = x, origY = y;
-            switch (rot) {
-                case 1: origX = 63 - y; origY = x; break;      // 90°
-                case 2: origX = 63 - x; origY = 63 - y; break; // 180°
-                case 3: origX = y; origY = 63 - x; break;      // 270°
-            }
-            int idx = origY * 64 + origX;
-            uint8_t col = getPixel(img, idx);
-            if (col != 0) dma_display->drawPixel(screenX, screenY, palette[col]);
-        }
-    }
-}
-
+ 
 
 void putimageInvert(int px, int py, const unsigned char* img) {
     for (int y = 0; y < 64; y++) {
@@ -246,78 +184,4 @@ void putimageInvert(int px, int py, const unsigned char* img) {
     }
 }
 
-
-void putimageBlend(int px, int py, const unsigned char* img1, const unsigned char* img2, float blend) { // blend=0: img1, 1: img2
-    blend = constrain(blend, 0.0f, 1.0f);
-    for (int y = 0; y < 64; y++) {
-        int screenY = py + y;
-        if (screenY < 0 || screenY >= PANEL_RES_Y) continue;
-        for (int x = 0; x < 64; x++) {
-            int screenX = px + x;
-            if (screenX < 0 || screenX >= PANEL_RES_X) continue;
-            int idx = y * 64 + x;
-            uint8_t col1 = getPixel(img1, idx);
-            uint8_t col2 = getPixel(img2, idx);
-            if (col1 != 0 || col2 != 0) {
-                uint8_t blendedCol = (uint8_t)(col1 * (1 - blend) + col2 * blend);
-                dma_display->drawPixel(screenX, screenY, palette[blendedCol]);
-            }
-        }
-    }
-}
-
-
-
-
-void putimageCycle(int px, int py, const unsigned char* img, int offset) {
-    for (int y = 0; y < 64; y++) {
-        int screenY = py + y;
-        if (screenY < 0 || screenY >= PANEL_RES_Y) continue;
-
-        for (int x = 0; x < 64; x++) {
-            int screenX = px + x;
-            if (screenX < 0 || screenX >= PANEL_RES_X) continue;
-
-            int idx = y * 64 + x;
-            uint8_t col = getPixel(img, idx);
-            if (col != 0) {
-                int cycledCol = (col + offset) % 16;
-                dma_display->drawPixel(screenX, screenY, palette[cycledCol]);
-            }
-        }
-    }
-}
-
-
-// convert 64x64 image to 32x32
-unsigned char* convertimagesize(int px, int py, const unsigned char* img, int size) {
-    if (size != 32) return nullptr; // Only support 32x32 output for now
-    unsigned char* output = new unsigned char[512];
-    memset(output, 0, 512);
-    for (int y = 0; y < 32; y++) {
-        for (int x = 0; x < 32; x++) {
-            int origX = x * 2, origY = y * 2;
-            int idx1 = origY * 64 + origX;
-            int idx2 = origY * 64 + (origX + 1);
-            int idx3 = (origY + 1) * 64 + origX;
-            int idx4 = (origY + 1) * 64 + (origX + 1);
-            uint8_t col1 = getPixel(img, idx1);
-            uint8_t col2 = getPixel(img, idx2);
-            uint8_t col3 = getPixel(img, idx3);
-            uint8_t col4 = getPixel(img, idx4);
-            uint8_t avgCol = (col1 + col2 + col3 + col4) / 4;
-            int outIdx = y * 32 + x;
-            setPixel(output, outIdx, avgCol);
-        }
-    }
-    return output;
-}
-
-
-
-
-
-
-
-
-
+ 
