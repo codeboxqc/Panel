@@ -36,7 +36,7 @@ Clone the Repository:
 
 Open VS Code.
 Go to the Terminal (View > Terminal or Ctrl+`).
-Run: git clone https://github.com/yourusername/your-repo-name.git (replace with your repo URL).
+Run: git clone[ https://github.com/yourusername/your-repo-name.git](https://github.com/codeboxqc/Panel.git)  
 Open the cloned folder in VS Code (File > Open Folder).
 
 
@@ -172,6 +172,7 @@ Open a web browser (Chrome/Firefox).
 Go to: http://192.168.4.1
 You should see the "ESP32 Configuration" page with WiFi and Pin fields.
 
+![1](https://github.com/user-attachments/assets/8dbb01cc-ca5c-4c4f-b319-f3a1ead72b11)
 
 Enter Configuration:
 
@@ -210,3 +211,9 @@ Issues: Report bugs or feature requests.
 
 License
 MIT License - Free to use/modify.
+
+
+![2460a20d70e4de6d3298214ffb9f6a54](https://github.com/user-attachments/assets/46db8025-7766-4377-9773-d78f9dca8e93)
+![1757968882935](https://github.com/user-attachments/assets/42c1f722-4faa-447a-8d5f-3ceb506a8543)
+![Sda4bee1fa1d64fe7be8f3cd4c757da96f](https://github.com/user-attachments/assets/44a9d76b-e05e-421d-a626-35b0df0d00b7)
+
