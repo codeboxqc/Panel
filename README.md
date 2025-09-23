@@ -223,3 +223,17 @@ MIT License - Free to use/modify.
 ![1757968882935](https://github.com/user-attachments/assets/42c1f722-4faa-447a-8d5f-3ceb506a8543)
 ![Sda4bee1fa1d64fe7be8f3cd4c757da96f](https://github.com/user-attachments/assets/44a9d76b-e05e-421d-a626-35b0df0d00b7)
 
+
+part need for this  DIY indoor P3 RGB module 192*192mm pixel 64*64 HUB75 Compatible with Raspberry Pi smd dot matrix screen
+[https://www.aliexpress.com/p/order/index.html?spm=a2g0o.home.headerAcount.2.650c6278PyRpNx](https://www.aliexpress.com/item/1005007531631866.html?spm=a2g0o.order_list.order_list_main.5.3f7f18027b8KoF)
+
+
+Freenove ESP32-S3 ESP32 S3 Wireless Board, Dual-core 32-bit 240 MHz Microcontroller
+https://www.aliexpress.com/item/1005007758555205.html?spm=a2g0o.order_list.order_list_main.39.3f7f18027b8KoF
+Freenove Breakout Board for ESP32 / ESP32-S3 WROVER WROOM, Terminal Block Shield HAT, 5V 3.3V Power Outputs, GPIO Status LED
+https://www.aliexpress.com/item/1005005879655901.html?spm=a2g0o.order_list.order_list_main.11.3f7f18027b8KoF
+
+16Pin Jumper Wire Dupont Line 20cm Male To  Female  
+2 Female  To  Female    pawer from  Breakout Board to panel power up
+https://www.aliexpress.com/p/order/detail.html?spm=a2g0o.order_list.order_list_main.41.3f7f18027b8KoF&orderId=8204301001571878
+
