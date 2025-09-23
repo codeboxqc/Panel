@@ -1,3 +1,8 @@
+ESP32-S3-WROOM Dual-core 32-bit 240 MHz
+
+  esp32dev compatible
+  need fast one and 8mb memory
+
 ESP32 LED Matrix Display Project README
 This project is an ESP32-based firmware for driving HUB75 LED matrix panels (e.g., 64x64 RGB LED matrices). It includes features like:
 
