@@ -8,16 +8,16 @@
 // -------------------- Config --------------------
 const char* ntpServer = "pool.ntp.org";
 const char* timezone  = "EST5EDT,M3.2.0,M11.1.0"; // New York time
- char* ssid      = "class";
- char* password  = "class";
+char ssid[64];
+char password[64];
 
- String ssidGlob;
- String  passwordGlob;
+ String ssidGlob  ;
+ String  passwordGlob  ;
 
-int Tok=0;
+ 
 
 
- unsigned char z0[] = {
+ const unsigned char z0[49] PROGMEM= {
   0,1,1,1,1,1,0,
   1,0,0,0,0,0,1,
   1,0,0,0,0,0,1,
@@ -28,7 +28,8 @@ int Tok=0;
 };
 
 
-unsigned char z1[]={    0,0,0,1,0,0,0,
+ const unsigned char z1[49]  PROGMEM={   
+                        0,0,0,1,0,0,0,
                         0,0,1,1,0,0,0,
                         0,1,0,1,0,0,0,
                         0,0,0,1,0,0,0,
@@ -38,7 +39,8 @@ unsigned char z1[]={    0,0,0,1,0,0,0,
 };
 
 
-unsigned char z2[]={    0,0,1,1,1,1,0,
+ const unsigned char z2[49]  PROGMEM={    
+                        0,0,1,1,1,1,0,
                         0,1,0,0,0,1,0,
                         0,0,0,0,1,0,0,
                         0,0,0,1,0,0,0,
@@ -47,7 +49,8 @@ unsigned char z2[]={    0,0,1,1,1,1,0,
                         1,1,1,1,1,1,0
 };
 
-unsigned char z3[]={    0,0,1,1,1,1,0,
+ const unsigned char z3[49]  PROGMEM={    
+                        0,0,1,1,1,1,0,
                         0,1,0,0,0,0,1,
                         0,0,0,0,0,1,0,
                         0,0,0,0,1,0,0,
@@ -58,7 +61,8 @@ unsigned char z3[]={    0,0,1,1,1,1,0,
 
 
 
-unsigned char z4[]={    0,0,0,1,0,0,0,
+ const unsigned char z4[49]  PROGMEM={    
+                        0,0,0,1,0,0,0,
                         0,0,1,1,0,0,0,
                         0,1,0,1,0,0,0,
                         1,0,0,1,0,0,0,
@@ -69,7 +73,8 @@ unsigned char z4[]={    0,0,0,1,0,0,0,
 
 
 
-unsigned char z5[]={    0,1,1,1,1,1,0,
+ const unsigned char z5[49]  PROGMEM={    
+                        0,1,1,1,1,1,0,
                         0,1,0,0,0,0,0,
                         0,1,0,0,0,0,0,
                         0,1,1,1,1,1,0,
@@ -78,7 +83,8 @@ unsigned char z5[]={    0,1,1,1,1,1,0,
                         0,0,1,1,1,1,0
 };
 
-unsigned char z6[]={    0,0,0,1,1,1,0,
+ const unsigned char z6[49]  PROGMEM={    
+                        0,0,0,1,1,1,0,
                         0,0,1,0,0,0,0,
                         0,1,0,0,0,0,0,
                         0,1,1,1,1,1,0,
@@ -88,7 +94,8 @@ unsigned char z6[]={    0,0,0,1,1,1,0,
 };
 
 
-unsigned char z7[]={    0,1,1,1,1,1,1,
+ const unsigned char z7[49]  PROGMEM={    
+                        0,1,1,1,1,1,1,
                         0,0,0,0,0,1,0,
                         0,0,0,0,1,0,0,
                         0,0,0,1,0,0,0,
@@ -98,7 +105,8 @@ unsigned char z7[]={    0,1,1,1,1,1,1,
 };
 
 
-unsigned char z8[]={    0,1,1,1,1,1,0,
+ const unsigned char z8[49]  PROGMEM={    
+                       0,1,1,1,1,1,0,
                         1,0,0,0,0,0,1,
                         0,1,0,0,0,1,0,
                         0,0,1,1,1,0,0,
@@ -108,7 +116,8 @@ unsigned char z8[]={    0,1,1,1,1,1,0,
 };
 
 
-unsigned char z9[]={    0,0,1,1,1,1,0,
+ const unsigned char z9[49]  PROGMEM={    
+                       0,0,1,1,1,1,0,
                         0,1,0,0,0,0,1,
                         0,1,0,0,0,0,1,
                         0,0,1,1,1,1,1,
@@ -118,7 +127,7 @@ unsigned char z9[]={    0,0,1,1,1,1,0,
 };
 
 
- unsigned char* digits[10] = { z0, z1, z2, z3, z4, z5, z6, z7, z8, z9 };
+  
 
 
  
@@ -128,22 +137,21 @@ unsigned char z9[]={    0,0,1,1,1,1,0,
 bool connectWiFi() {
 
 
+ 
+ strncpy(ssid, ssidGlob.c_str(), sizeof(ssid));
+ ssid[sizeof(ssid)-1] = '\0';   
 
-
-  if (ssidGlob.length() == 0)   return false;
-
-  // Convert String to char*
-  ssid =     (char*)  ssidGlob.c_str();     
-  password = (char*)  passwordGlob.c_str();
+strncpy(password, passwordGlob.c_str(), sizeof(password));
+password[sizeof(password)-1] = '\0';
 
   
    
 
   WiFi.begin(ssid, password);
   int attempts = 0;
-  while (WiFi.status() != WL_CONNECTED && attempts < 20) {
-    delay(1000);
-    Serial.print(".");
+  while (WiFi.status() != WL_CONNECTED && attempts < 4) {
+    delay(300);
+    //Serial.print(".");
     attempts++;
   }
   return (WiFi.status() == WL_CONNECTED);
@@ -155,40 +163,51 @@ bool getTimeFromHTTP() {
   HTTPClient http;
   http.begin("http://worldtimeapi.org/api/timezone/America/New_York");
   int httpCode = http.GET();
+  bool success = false;
   if (httpCode == 200) {
     String payload = http.getString();
     int idx = payload.indexOf("\"datetime\":\"");
     if (idx > 0) {
-      String datetime = payload.substring(idx + 12, idx + 31); // 2025-09-03T14:22:05
+      String datetime = payload.substring(idx + 12, idx + 31);
       struct tm tm;
       if (strptime(datetime.c_str(), "%Y-%m-%dT%H:%M:%S", &tm)) {
         timeval now = { mktime(&tm), 0 };
         settimeofday(&now, NULL);
-        http.end();
-        return true;
+        success = true;
       }
     }
   }
-  http.end();
-  return false;
+  http.end(); // Always release resources
+  return success;
 }
+
 
 bool syncTime() {
   configTzTime(timezone, ntpServer);
-  delay(1000);
+
   struct tm timeinfo;
+  unsigned long start = millis();
+  const unsigned long timeout = 1000; // 1 second max wait
+
+  while (!getLocalTime(&timeinfo) && millis() - start < timeout) {
+    delay(10); // small non-blocking wait
+  }
+
   if (getLocalTime(&timeinfo)) {
     return true;
-  } else {
-    return getTimeFromHTTP();
   }
+
+  // Fallback to HTTP if NTP fails
+  return getTimeFromHTTP();
 }
+
 
 // -------------------- Draw helpers --------------------
  
 void drawDigit(int digit, int x, int y, uint16_t color, uint16_t bg) {
     if (digit < 0 || digit > 9) return;
-    unsigned char* d = digits[digit];
+
+    const unsigned char* digits[10] = { z0, z1, z2, z3, z4, z5, z6, z7, z8, z9 };
 
     for (int row = 0; row < 7; row++) {
         for (int col = 0; col < 7; col++) {
@@ -196,7 +215,7 @@ void drawDigit(int digit, int x, int y, uint16_t color, uint16_t bg) {
             int screenX = x + col;
             int screenY = y + row;
 
-            if (d[idx] == 1)
+            if (digits[digit][idx] == 1)
              
                 dma_display->drawPixel(screenX, screenY, color);
             else
@@ -219,12 +238,12 @@ void drawDigit(int digit, int x, int y, uint16_t color, uint16_t bg) {
 
 // -------------------- Show time --------------------
 void showtime(int xx, int yy, uint16_t color) {
-    struct tm timeinfo;
+    struct tm timeinfo={};
 
     memset(&timeinfo, 0, sizeof(timeinfo));
 
     if (!getLocalTime(&timeinfo)) {
-        Serial.println("No time yet!");
+        //Serial.println("No time yet!");
         return;
     }
 
@@ -275,32 +294,15 @@ void showtime(int xx, int yy, uint16_t color) {
 void inittime() {
 
    
- 
-
-  if (connectWiFi()) {
-     
-    syncTime();
-  } else {
-    
-  }
+  if (connectWiFi())  syncTime();
+   
 }
 
 void time(int x,int y) {   // your external loop
   
   
-  // drawDigit(0, 10+(7*1), 10, 0x07E0, 0x0000);
-  // drawDigit(1, 11+(7*2), 10, 0x07E0, 0x0000);
-  // drawDigit(2, 12+(7*3), 10, 0x07E0, 0x0000);
-  // drawDigit(3, 13+(7*4), 10, 0x07E0, 0x0000);
-  // drawDigit(4, 15+(7*5), 10, 0x07E0, 0x0000);
-  // drawDigit(5, 16+(7*6), 10, 0x07E0, 0x0000);
-  // drawDigit(6, 10+(7*1), 10+(7*2), 0x07E0, 0x0000);
-  // drawDigit(7, 11+(7*2), 11+(7*2), 0x07E0, 0x0000);
-  // drawDigit(8, 13+(7*3), 12+(7*2), 0x07E0, 0x0000);
-  // drawDigit(9, 10, 10, 0x07E0, 0x0000);
-
+   
 
   showtime(x,y,0x07E0);
-  // delay(30); // update once per second
- // dma_display->clearScreen();
+  
 }

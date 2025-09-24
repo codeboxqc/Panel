@@ -3,14 +3,14 @@
 
 #include <Arduino.h>
 #include <WiFi.h>
+#include <WiFiClientSecure.h>
 #include <WebServer.h>
 #include <Preferences.h>
 #include <ESP32-HUB75-MatrixPanel-I2S-DMA.h>
 
 // Panel configuration
-#define PANEL_RES_X 64
-#define PANEL_RES_Y 64  
-#define PANEL_CHAIN 1
+ 
+ 
 
 // Configuration des pins par défaut pour la matrice LED HUB75
 struct MatrixPins {
@@ -32,7 +32,7 @@ struct MatrixPins {
     // Function to create HUB75 configuration
     HUB75_I2S_CFG::i2s_pins getPinsConfig() {
         return {R1_PIN, G1_PIN, B1_PIN, R2_PIN, G2_PIN, B2_PIN,
-                A_PIN, B_PIN, C_PIN, D_PIN, E_PIN, LAT_PIN, OE_PIN, CLK_PIN};
+               A_PIN, B_PIN, C_PIN, D_PIN, E_PIN, LAT_PIN, OE_PIN, CLK_PIN};
     }
 };
 
@@ -61,9 +61,11 @@ void createAccessPoint();
  int  initFirstBoot();
 void checkResetButton();
 // Web page declaration
-extern const char* CONFIG_PAGE;
+ 
 
 extern String ssidGlob;
 extern String passwordGlob;
+
+
 
 #endif

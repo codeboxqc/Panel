@@ -8,38 +8,19 @@
 // ====================================================
 // HUB75 Panel Configuration
 // ====================================================
-#define PANEL_RES_X 64      // Width of a single panel
-#define PANEL_RES_Y 64      // Height of a single panel
+ 
 #define PANEL_CHAIN 1       // How many panels chained
 
+#define WIDTH 64
+#define HEIGHT 64
+ 
 
 void time(int x,int y);
 void inittime();
 
-extern unsigned char i1[2048];
-extern unsigned char i2[2048];
-extern unsigned char i3[2048];
-extern unsigned char i4[2048];
-extern unsigned char i5[2048];
-extern unsigned char i6[2048];
-extern unsigned char i7[2048];
-extern unsigned char i8[2048];
-extern unsigned char i9[2048];
-extern unsigned char i10[2048];
-extern unsigned char i11[2048];
-extern unsigned char i12[2048];
-extern unsigned char i13[2048];
-extern unsigned char i14[2048];
-extern unsigned char i15[2048];
- 
- 
- 
- 
- 
-
+extern unsigned char x64 [2048];
 extern MatrixPanel_I2S_DMA *dma_display;
- 
-extern  uint16_t palette256[256];
+ extern  uint16_t palette256[256];
 extern  uint16_t palette[16];
 
 
@@ -54,13 +35,14 @@ typedef struct {
 
 // Global flame instance (declared here, defined once in a .cpp file)
 extern Flame flame;
+
 ///////////////////////////////////////////////////
 
 
 /////////////////////////////////////////////////////
 //plasma
 //#define PI 3.14159265358979323846
-#define NB 100        // Number of stars for 64x64 panel
+#define NB 80        // Number of stars for 64x64 panel
 #define STAR_SPEED 4.0f // Speed of stars moving toward viewer
 #define Z_FAR 300.0f   // Far z-plane (lower zoom)
 #define Z_NEAR 10.0f   // Near z-plane (stars reset here)
@@ -74,8 +56,8 @@ typedef struct {
     int width;
     int height;
 } Plasma;
-
 extern Plasma plasma;
+
 
 // Functions
 void initFlame(Flame* f);
@@ -83,7 +65,7 @@ void updateFlame(Flame* f);
 void drawFlame(Flame* f);
 /////////////////////////////////////////////////////////////////
 
-
+bool loadImage(const char* path, uint8_t* buffer, size_t bufSize) ;
 
 /////////////////////////////////////////////////////////////////
 // Additional parameters for enhanced effect
@@ -102,31 +84,10 @@ typedef struct {
  void drawMatrixRain(MatrixRain* rain) ;
 /////////////////////////////////////////////////////////////////
 
-#define HEIGHT 64
-#define WIDTH 64
-
  
-  
-
- /////////////////////////////////////////////////
-typedef struct {
-  float angle;
-  float sweep_speed;
-  uint8_t trail[HEIGHT][WIDTH];
-  uint8_t blip_map[HEIGHT][WIDTH]; 
-  uint32_t last_update;
-} RadarScan;
-
-extern RadarScan radar;
-
-void drawRadarScan();
-void updateRadarScan();
-void initRadarScan() ;
- ///////////////////////////////////////////////
-void draw3DCube(float centerX, float centerY, float scale, float rotX, float rotY, float rotZ, float t);
  ///////////////////////////////////
  //Modern Particle Wave Animation
-#define NUM_PARTICLES 12
+#define NUM_PARTICLES 7
   
 typedef struct {
   float x, y;
@@ -138,8 +99,8 @@ typedef struct {
 
 
 
-// Modern color palettes
-const uint32_t palettes[][8] = {
+ 
+const uint32_t palettes[][8]  PROGMEM= {
   // Cyberpunk (blues and purples)
   {0xFF00FF, 0x00FFFF, 0x0000FF, 0xFF00FF, 0x00FF00, 0xFFFF00, 0xFF0000, 0xFFFFFF},
   // Neon (bright colors)
@@ -156,10 +117,7 @@ void updateParticleSystem() ;
 void drawParticleSystem();
 void nextColorMode();
  ///////////////////////////////////////////
-
-
-
-
+ 
 
 void initPlasma(Plasma* plasma);
  void updatePlasma(Plasma* plasma);
@@ -171,7 +129,7 @@ void initPlasma(Plasma* plasma);
 
  uint8_t getPixel(const unsigned char* buf, int idx);
  void setPixel(unsigned char* buf, int idx, uint8_t color);
- void clipini();
+ 
  void putimageColorMap(int px, int py, const unsigned char* img, int color) ;
  void putimagesize(int px, int py, const unsigned char* img, int size);
  void putimage(int px, int py, const unsigned char* img);
@@ -181,38 +139,29 @@ void initPlasma(Plasma* plasma);
  void putimageBlend(int px, int py, const unsigned char* img1, const unsigned char* img2, float blend) ;
  
  
-
- void plasmaEffect(int px, int py, unsigned long timeOffset) ;
+ 
  void putimageCycle(int px, int py, const unsigned char* img, int offset);
- unsigned char* convertimagesize(int px, int py, const unsigned char* img, int size);
-
-
+ 
 
  
  void plasmaEffect(unsigned long time);
-  
- 
  void pixelRainEffect(unsigned long time);
  void  Rain (unsigned long time);
  void rain16(unsigned long time);
-void plasmaEffect(int px, int py, unsigned long timeOffset);
- 
  void matrixDigitalRain(unsigned long time);
-void fireAnimation(unsigned long time);
-void switchFractalPlasma(unsigned long time) ;
+ void fireAnimation(unsigned long time);
+ void switchFractalPlasma(unsigned long time) ;
  void fastFractalPlasma(unsigned long time);
  void fastFractalMorph(unsigned long time);
-void vanGoghPaintAnimation(unsigned long time );
+ void vanGoghPaintAnimation(unsigned long time );
 void Jetstream(float t);
 void Pivotal(float t);
 void Pillars(float t);
 void RadialGlow(uint32_t time);
 void RaymarchGlow(float t);
- void TronMatrixPulse(float t);
+void TronMatrixPulse(float t);
 void GooGlow(float t) ;
-
- void blue(float t);
-
+ 
  
 
 #endif

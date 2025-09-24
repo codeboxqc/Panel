@@ -1,13 +1,14 @@
 #include <Arduino.h>
 #include <ESP32-HUB75-MatrixPanel-I2S-DMA.h>
 #include <math.h>
-
+//#include <SPIFFS.h>
 #include "gfx.h"
 #include "firstboot.h" 
   
 
 
 // Pin configuration - adjust these for your ESP32 setup
+ 
 #define R1_PIN 17
 #define B1_PIN 8
 #define R2_PIN 3
@@ -22,7 +23,7 @@
 #define B_PIN 11
 #define D_PIN 4
 #define LAT_PIN 6
-
+ 
 
 MatrixPanel_I2S_DMA *dma_display;
 
@@ -50,7 +51,7 @@ uint16_t palette[16] = {
 
 
 // 256-color palette definition
-uint16_t palette256[256] = {
+uint16_t palette256[256]  = {
     // Basic 16 colors repeated for simplicity
     0x0000, 0xF800, 0x07E0, 0x001F, 0xFFE0, 0xF81F, 0x07FF, 0xFFFF,
     0x7BEF, 0x4208, 0xFBE0, 0xAFE5, 0x780F, 0xFFE5, 0x07F3, 0xAD55,
@@ -98,23 +99,21 @@ uint16_t palette256[256] = {
 Flame flame={};
 Plasma plasma={};
 MatrixRain matrix={};
-RadarScan radar={};
-
-
-
+ 
+ 
 
 float fade = 1.0f; // Start fully visible
  
-    // Array of pointers to the image arrays
-unsigned char *images[] = {  i1, i2, i3, i4, i5, i6, i7, i8, i9, i10, i11, i12, i13, i14, i15 };
-
+ 
 void bubble(int q);
 void pacman(int q);
 
-extern void checkResetButton();
-extern void resetConfig();
+ 
 
 void fbootPIN() { int i=0;
+
+
+    
 
  // Initialize first boot configuration
     i=initFirstBoot();
@@ -130,7 +129,7 @@ void fbootPIN() { int i=0;
     
     // Create HUB75 configuration
     HUB75_I2S_CFG::i2s_pins _pins = matrixPins.getPinsConfig();
-    HUB75_I2S_CFG mxconfig(PANEL_RES_X, PANEL_RES_Y, PANEL_CHAIN, _pins);
+    HUB75_I2S_CFG mxconfig(WIDTH, HEIGHT, PANEL_CHAIN, _pins);
     
     // Initialize matrix
     dma_display = new MatrixPanel_I2S_DMA(mxconfig);
@@ -141,56 +140,63 @@ void fbootPIN() { int i=0;
 // Setup
 // ====================================================
 void setup() {
-  Serial.begin(115200);
+ // Serial.begin(115200);
+  //SPIFFS.begin(true);
 
-  /*
+   /*
   // Configure HUB75 pins
   HUB75_I2S_CFG::i2s_pins _pins = {
     R1_PIN,G1_PIN,B1_PIN,R2_PIN,G2_PIN,B2_PIN,
     A_PIN,B_PIN,C_PIN,D_PIN,E_PIN,LAT_PIN,OE_PIN,CLK_PIN
   };
 
-   HUB75_I2S_CFG mxconfig(PANEL_RES_X, PANEL_RES_Y, PANEL_CHAIN, _pins);
-
-  // Initialize display
-  dma_display = new MatrixPanel_I2S_DMA(mxconfig);
-
-  */
-
-
-   fbootPIN();
-
+   HUB75_I2S_CFG mxconfig(WIDTH, HEIGHT, PANEL_CHAIN, _pins);
 
    //resetConfig();
 
+  // Initialize display
+  dma_display = new MatrixPanel_I2S_DMA(mxconfig);
 
   dma_display->begin();
   dma_display->setBrightness8(100);
   dma_display->clearScreen();
 
-//randomSeed(analogRead(A0));
+
+  dma_display->drawRect(0,0,WIDTH,HEIGHT,0x07E0);
+  dma_display->println("        ");
+  dma_display->println("Wifi:ESP32 ");
+  dma_display->println(" http://19 2.168.4.1 ");
+  dma_display->println("  Button  ");
+  dma_display->println(" 2x reset ");
+  
+   */
 
  
+  //resetConfig();
 
-//putimage(0, 0, i1);
 
-//putimagesize(1, 1, i1,  32);
+  //delay(25);
 
-//i8 face test
-//putimage(0, 0, i2); //20
-bubble(0);
-//delay(1000);
+  
+ fbootPIN();
 
+  dma_display->begin();
+  dma_display->setBrightness8(100);
+  dma_display->clearScreen();
+ 
+  bubble(2);
+
+  //delay(1000);
 
  
 
  inittime();
+
  initFlame(&flame);
- initPlasma(&plasma);
- initStarfield();
+  initPlasma(&plasma);
+  initStarfield();
  initMatrixRain(&matrix);
- initParticleSystem();
- initRadarScan() ;
+  initParticleSystem();
 
 }
 
@@ -212,26 +218,28 @@ const unsigned long showTimeDuration = 2UL * 60UL * 1000UL;  // 2 minutes
 const unsigned long animInterval = 3UL * 60UL * 1000UL;    //  15 minutes
 const unsigned long hourInterval = 58UL * 60UL * 1000UL;     // 60 minutes
 unsigned long st =0;
-uint8_t currentAnimation = 0;
+uint8_t currentAnimation = 6; //random(1,15);
 bool showTime = false;  // Tracks whether to show time or animation
 bool hasShownThisHour = false;  // Flag to prevent showing multiple times per hour
 
 float Jets=0.0f;
+ // Get current time
+ struct tm timeinfo;
 
 void loop() {
     unsigned long now = millis();
 
-    checkResetButton();
 
+   
+ checkResetButton();
 
-    // Get current time
-    struct tm timeinfo;
+   
     if (!getLocalTime(&timeinfo)) {
         // If we can't get time, fall back to original behavior
         if (now - stateStartTime >= 60UL * 60UL * 1000UL) { // 60 minutes
             showTime = true;
             stateStartTime = now;
-            currentAnimation = random(0, 25);
+            currentAnimation = random(0, 22);
             hasShownThisHour = false;
         }
     } else {
@@ -239,7 +247,7 @@ void loop() {
         if (timeinfo.tm_min == 59 && !hasShownThisHour) {
             showTime = true;
             stateStartTime = now;
-            currentAnimation = random(0, 25);  // Pick animation for after time display
+            currentAnimation = random(0, 22);  // Pick animation for after time display
             hasShownThisHour = true;
         }
         
@@ -257,14 +265,14 @@ void loop() {
     
     // Check if it's time to change animation (every 3 minutes, only when not showing time)
     if (!showTime && now - stateStartTime >= animInterval) {
-        currentAnimation = random(0, 25);  // Pick a new animation
+        currentAnimation = random(0, 22);  // Pick a new animation
         stateStartTime = now;  // Reset state start time
         
         int i = random(0, 3);
         bubble(i);
         
         fade = 1.0f;
-        //Jets = 0.0f;
+         Jets = 0.0f;
     }
 
 //19
@@ -279,7 +287,8 @@ void loop() {
             case 0:
                 updateFlame(&flame);
                 drawFlame(&flame);
-                delay(33);
+                
+                //delay(33);
                 break;
 
             case 1:
@@ -289,9 +298,8 @@ void loop() {
                 break;
 
             case 2:
-                drawRadarScan();
-                updateRadarScan();
-                delay(33);
+                GooGlow(Jets );
+                 Jets += 0.03;
                 break;
 
             case 3:
@@ -303,21 +311,23 @@ void loop() {
 
             case 4: 
                 
-             
-                 matrixDigitalRain(millis());
-               
-                 delay(33);
-                //dma_display->clearScreen();
+              TronMatrixPulse(Jets );
+              Jets += 0.03;     
+              delay(2);   
+                
                 break;
                 
 
             case 5: //////////////////
-                pacman(0);
+                   RaymarchGlow(Jets );
+                       Jets += 0.03;
+                       delay(5);
                 break;
 
             case 6:
                  
-                 Rain(millis());
+                // 
+                 rain16(millis());
                 //delay(10);
                 //dma_display->clearScreen();
                 break;
@@ -337,32 +347,31 @@ void loop() {
 
 
             case 9:
-                 st = millis();
-                while (millis() - st < 8000) plasmaEffect(millis());
-                delay(33);
+                 
+                plasmaEffect(millis());
+                
                 break;
 
             case 10:///////////////////////////////
-                  pacman(0);
+                  Rain(millis());
                 break;
 
             case 11:
-                  st = millis();
-                  while (millis() - st < 5000) rain16(millis());
-                  delay(33);
-                  //dma_display->clearScreen();
-                break;
+                  
+                   RadialGlow(millis()); 
+                   break;
 
                case 12://////////////////////////////////////
-                 bubble(random(0,4));
                 
+                 Pillars(Jets);   
+                 Jets += 0.03;
                 break;
 
                  case 13://orange fall
                  fireAnimation(millis());
                  break;
 
-                  case 14: ///////////////???slow
+                  case 14:  //?
                      switchFractalPlasma(millis());
                        break;
 
@@ -377,61 +386,38 @@ void loop() {
 
                  case 17:
                   
-                 
-                 
-                  vanGoghPaintAnimation(millis() );
+                 vanGoghPaintAnimation(millis() );
                   
                  break;
 
                  case 18:
                    Jetstream( Jets);
                    Jets += 0.05;             
-                   delay(10);
+                    
                  break;
 
                  case 19:
-                 Pivotal(Jets);//////////////////slow
-                 Jets += 0.03;                  
+                 Pivotal(Jets);//////////////////to delete
+                 Jets += 0.07;                  
                  break;
 
                  case 20:
-                  st = millis();
-                  while (millis() - st < 5000) {  Pillars(Jets);   Jets += 0.03; }
+                pacman(0); 
                                    
                  break;
                   
                  case 21:
-                        RadialGlow(millis());
                        
+                   bubble(random(0,4));  
                   break;            
                        
-
-                 case 22:
-                       RaymarchGlow(Jets );
-                       Jets += 0.03;
-                       delay(5);
-                                   
-                 break;
-                       
-                 case 23:
-                          
-
-                      TronMatrixPulse(Jets );
-                       Jets += 0.03;     
-                       delay(2);   
-                 break;
-
-                 case 24:
-                 GooGlow (Jets );
-                 Jets += 0.03;
-                 break;
-
-                  
+              
+              
 
                
+                  
 
-
-                 
+              
                  
 
             default:
@@ -451,25 +437,25 @@ void loop() {
  
 void bubble(int q) {
 
-    int bob = random(0, 16);  // Random index  image.cpp
+    int bob = random(0, 16); 
     dma_display->clearScreen();
 
-    if(q==0) putimage(0, 0, images[bob]);  // Display the selected image at (1, 1)
+    if(q==0) putimage(0, 0, x64);   
 
-    if(q==1) { for(int i=0;i<50;i++ ) { putimageFade(0, 1,  images[bob],fade); fade -= 0.02f; 
+    if(q==1) { for(int i=0;i<50;i++ ) { putimageFade(0, 1,  x64,fade); fade -= 0.02f; 
                              delay(33);
                  }}
 
     if(q==2) {  
-               putimageColorMap(0, 0, images[bob] ,palette[random(1,16)]); 
+               putimageColorMap(0, 0, x64 ,palette[random(1,16)]); 
                     
                }
 
-    if(q==3) { putimageInvert(0, 0, images[bob]); }
+    if(q==3) { putimageInvert(0, 0, x64); }
 
     if(q!=1) delay(5000);
      
-    dma_display->clearScreen();
+   // dma_display->clearScreen();
 
 
    
@@ -486,7 +472,7 @@ void pacman(int q) {
         
         // Draw new image
         y = 15 + random(0, 3);
-        putimagesize(x, y, images[bob], 32);
+        putimagesize(x, y, x64, 32);
         x++;
         delay(33);
          

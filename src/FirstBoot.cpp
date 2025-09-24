@@ -1,6 +1,166 @@
 #include "firstboot.h"
  
  
+//http://192.168.4.1
+
+
+// Configuration web page
+const char  CONFIG_PAGE[] PROGMEM= R"(
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ESP32 First Boot Configuration</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body { font-family: Arial; margin: 20px; background: #f0f0f0; }
+        .container { max-width: 600px; margin: 0 auto; background: white; padding: 20px; border-radius: 10px; }
+        .form-group { margin: 15px 0; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input[type="text"], input[type="password"], input[type="number"] { 
+            width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; 
+        }
+        .pin-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .btn { background: #4CAF50; color: white; padding: 12px 20px; border: none; border-radius: 4px; cursor: pointer; width: 100%; }
+        .btn:hover { background: #45a049; }
+        .status { margin: 10px 0; padding: 10px; border-radius: 4px; }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color #721c24; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>ESP32 Configuration</h1>
+        <p>Configure your WiFi and LED matrix pins</p>
+        
+        <form id="configForm">
+            <h2>WiFi Configuration</h2>
+            <div class="form-group">
+                <label>WiFi Network Name (SSID):</label>
+                <input type="text" id="ssid" name="ssid" required>
+            </div>
+            <div class="form-group">
+                <label>WiFi Password:</label>
+                <input type="password" id="password" name="password">
+            </div>
+            
+            <h2>LED Matrix Pins Configuration (HUB75)</h2>
+            <div class="pin-group">
+                <div class="form-group">
+                    <label>R1_PIN:</label>
+                    <input type="number" id="r1_pin" name="r1_pin" value="17" min="0" max="39">
+                </div>
+                <div class="form-group">
+                    <label>G1_PIN:</label>
+                    <input type="number" id="g1_pin" name="g1_pin" value="18" min="0" max="39">
+                </div>
+                <div class="form-group">
+                    <label>B1_PIN:</label>
+                    <input type="number" id="b1_pin" name="b1_pin" value="8" min="0" max="39">
+                </div>
+                <div class="form-group">
+                    <label>R2_PIN:</label>
+                    <input type="number" id="r2_pin" name="r2_pin" value="3" min="0" max="39">
+                </div>
+                <div class="form-group">
+                    <label>G2_PIN:</label>
+                    <input type="number" id="g2_pin" name="g2_pin" value="2" min="0" max="39">
+                </div>
+                <div class="form-group">
+                    <label>B2_PIN:</label>
+                    <input type="number" id="b2_pin" name="b2_pin" value="10" min="0" max="39">
+                </div>
+                <div class="form-group">
+                    <label>A_PIN:</label>
+                    <input type="number" id="a_pin" name="a_pin" value="15" min="0" max="39">
+                </div>
+                <div class="form-group">
+                    <label>B_PIN:</label>
+                    <input type="number" id="b_pin" name="b_pin" value="11" min="0" max="39">
+                </div>
+                <div class="form-group">
+                    <label>C_PIN:</label>
+                    <input type="number" id="c_pin" name="c_pin" value="7" min="0" max="39">
+                </div>
+                <div class="form-group">
+                    <label>D_PIN:</label>
+                    <input type="number" id="d_pin" name="d_pin" value="4" min="0" max="39">
+                </div>
+                <div class="form-group">
+                    <label>E_PIN:</label>
+                    <input type="number" id="e_pin" name="e_pin" value="13" min="0" max="39">
+                </div>
+                <div class="form-group">
+                    <label>LAT_PIN:</label>
+                    <input type="number" id="lat_pin" name="lat_pin" value="6" min="0" max="39">
+                </div>
+                <div class="form-group">
+                    <label>OE_PIN:</label>
+                    <input type="number" id="oe_pin" name="oe_pin" value="12" min="0" max="39">
+                </div>
+                <div class="form-group">
+                    <label>CLK_PIN:</label>
+                    <input type="number" id="clk_pin" name="clk_pin" value="5" min="0" max="39">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <button type="button" class="btn" onclick="saveConfig() ">Save Configuration</button>
+            </div>
+        </form>
+        
+        <div id="status"></div>
+    </div>
+
+    <script>
+        function saveConfig() {
+            console.log('Save button clicked');
+            const form = document.getElementById('configForm');
+            const formData = new FormData(form);
+            const data = {};
+            
+            for (let [key, value] of formData.entries()) {
+                data[key] = value;
+            }
+            
+            console.log('Sending data:', data);
+            
+            // Show immediate feedback
+            const status = document.getElementById('status');
+            status.innerHTML = '<div class="status">Saving configuration...</div>';
+            
+            fetch('/save', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            })
+            .then(response => {
+                console.log('Response status:', response.status);
+                return response.json();
+            })
+            .then(result => {
+                console.log('Result:', result);
+                if (result.success) {
+                    status.innerHTML = '<div class="status success">Configuration saved! ESP32 will restart...</div>';
+                    setTimeout(() => { 
+                        status.innerHTML = '<div class="status success">Restarting... Please wait...</div>';
+                    }, 3000);
+                } else {
+                    status.innerHTML = '<div class="status error">Error: ' + result.message + '</div>';
+                }
+            })
+            .catch(error => {
+                console.log('Error:', error);
+                document.getElementById('status').innerHTML = '<div class="status error">Connection error: ' + error.message + '</div>';
+            });
+        }
+    </script>
+</body>
+</html>
+)";
+
+
+
+
 
 // Variables globales
 WebServer server(80);
@@ -113,10 +273,10 @@ void resetConfig() {
     prefs.putBool("configured", false);
 
     prefs.end();
-    Serial.println("Pins configuration saved");
+     Serial.println("Pins configuration saved");
     prefs.clear();
     prefs.end();
-    Serial.println("Configuration erased - restarting...");
+     Serial.println("Configuration erased - restarting...");
     delay(1000);
     ESP.restart();
 }
@@ -142,7 +302,7 @@ void handleSave() {
     
     if (server.method() == HTTP_POST) {
         String body = server.arg("plain");
-        Serial.println("POST Body: " + body);
+         Serial.println("POST Body: " + body);
         
         // Parse JSON simple
         String ssid = "";
@@ -160,8 +320,8 @@ void handleSave() {
             password = body.substring(passStart, passEnd);
         }
         
-        Serial.println("SSID: " + ssid);
-        Serial.println("Password: " + password);
+        //Serial.println("SSID: " + ssid);
+        //Serial.println("Password: " + password);
         
         // Vérifier que les valeurs extraites sont valides
         int r1_val = extractPinValue(body, "r1_pin");
@@ -208,17 +368,17 @@ void handleSave() {
         if (clk_val != -1) pins.CLK_PIN = clk_val;
         
         if (ssid.length() > 0) {
-            Serial.println("Saving configuration...");
+            //Serial.println("Saving configuration...");
             saveWiFiConfig(ssid, password);
             savePinConfig(pins);
             
             server.send(200, "application/json", "{\"success\":true}");
-            Serial.println("Configuration saved, restarting...");
+             Serial.println("Configuration saved, restarting...");
             
             delay(2000);
             ESP.restart();
         } else {
-            Serial.println("SSID required");
+             Serial.println("SSID required");
             server.send(400, "application/json", "{\"success\":false,\"message\":\"SSID required\"}");
         }
     } else {
@@ -231,16 +391,16 @@ void handleSave() {
 // Create WiFi access point
 void createAccessPoint() {
     WiFi.softAP("ESP32Dev-Config", "");
-    Serial.println("Access point created");
+     Serial.println("Access point created");
     Serial.print("IP Address: ");
-    Serial.println(WiFi.softAPIP());
+     Serial.println(WiFi.softAPIP());
     
     server.on("/", handleRoot);
     server.on("/save", handleSave);
     server.begin();
     
-    Serial.println("Web server started");
-    Serial.println("Connect to 'ESP32-Config' network and go to http://192.168.4.1");
+     Serial.println("Web server started");
+     Serial.println("Connect to 'ESP32-Config' network and go to http://192.168.4.1");
 }
 
  
@@ -269,7 +429,7 @@ void checkResetButton2() {
             
             // Check for double press
             if (pressCount >= requiredPresses) {
-                Serial.println("Double press detected - resetting configuration...");
+                //Serial.println("Double press detected - resetting configuration...");
                 resetConfig();
                 pressCount = 0;
             }
@@ -280,7 +440,7 @@ void checkResetButton2() {
         // Reset counter if timeout reached
         if (pressCount > 0 && (millis() - lastPressTime) > doubleClickTimeout) {
             pressCount = 0;
-            Serial.println("Reset press counter (timeout)");
+             Serial.println("Reset press counter (timeout)");
         }
     }
 }
@@ -292,7 +452,7 @@ void checkResetButton() {
     if (digitalRead(RESET_BUTTON_PIN) == LOW) {
         if (!buttonPressed) {
             buttonPressed = true;
-            Serial.println("Reset button pressed - erasing configuration...");
+             Serial.println("Reset button pressed - erasing configuration...");
             resetConfig();
             delay(50); // Simple debounce delay
         }
@@ -303,7 +463,7 @@ void checkResetButton() {
 
 int initFirstBoot() {
     Serial.begin(115200);
-    Serial.println("ESP32 Starting...");
+     Serial.println("ESP32 Starting...");
     
     // Configurer le bouton de reset
     pinMode(RESET_BUTTON_PIN, INPUT_PULLUP);
@@ -312,11 +472,11 @@ int initFirstBoot() {
     isFirstBoot = checkFirstBoot();
     
     if (isFirstBoot) {
-        Serial.println("First boot - configuration mode");
+         Serial.println("First boot - configuration mode");
         createAccessPoint();
         return 0; // Configuration mode
     } else {
-        Serial.println("Configuration found, loading...");
+         Serial.println("Configuration found, loading...");
         pins = loadPinConfig();
         configComplete = true;
         return 1; // Skip configuration mode
@@ -341,3 +501,12 @@ MatrixPins getMatrixPins() {
 bool isConfigComplete() {
     return configComplete;
 }
+
+
+
+
+
+
+
+
+

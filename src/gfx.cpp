@@ -39,9 +39,13 @@ uint8_t findClosestColor(uint8_t r, uint8_t g, uint8_t b) {
 // 4bpp pixel helpers
 // ====================================================
 // Existing functions (unchanged)
-uint8_t getPixel(const unsigned char* buf, int idx) {
+ uint8_t getPixel(const unsigned char* buf, int idx) {
     return (idx & 1) ? (buf[idx >> 1] >> 4) & 0x0F : buf[idx >> 1] & 0x0F;
-}
+
+    
+ }
+
+ 
 
 void setPixel(unsigned char* buf, int idx, uint8_t color) {
     color &= 0x0F;
@@ -55,11 +59,11 @@ void setPixel(unsigned char* buf, int idx, uint8_t color) {
 void putimage(int px, int py, const unsigned char* img) {
     for(int y=0;y<64;y++){
         int screenY = py + y;
-        if(screenY<0 || screenY>=PANEL_RES_Y) continue;
+        if(screenY<0 || screenY>=HEIGHT) continue;
 
         for(int x=0;x<64;x++){
             int screenX = px + x;
-            if(screenX<0 || screenX>=PANEL_RES_X) continue;
+            if(screenX<0 || screenX>=WIDTH) continue;
 
             int idx = y*64 + x;
             uint8_t col = getPixel(img, idx);
@@ -73,13 +77,13 @@ void putimage(int px, int py, const unsigned char* img) {
 // ====================================================
 // Updated putimagesize with RGB averaging for better color accuracy
 void putimagesize(int px, int py, const unsigned char* img, int size) {
-    if (size <= 0 || size > PANEL_RES_Y) return;
+    if (size <= 0 || size > HEIGHT) return;
     for (int y = 0; y < size; y++) {
         int screenY = py + y;
-        if (screenY < 0 || screenY >= PANEL_RES_Y) continue;
+        if (screenY < 0 || screenY >=HEIGHT) continue;
         for (int x = 0; x < size; x++) {
             int screenX = px + x;
-            if (screenX < 0 || screenX >= PANEL_RES_X) continue;
+            if (screenX < 0 || screenX >= WIDTH) continue;
             // Calculate block of pixels to average
             float scale = 64.0f / size;
             int startX = (int)(x * scale);
@@ -123,11 +127,11 @@ void putimagesize(int px, int py, const unsigned char* img, int size) {
 void putimageColorMap(int px, int py, const unsigned char* img, int color){
     for(int y=0;y<64;y++){
         int screenY = py + y;
-        if(screenY<0 || screenY>=PANEL_RES_Y) continue;
+        if(screenY<0 || screenY>=HEIGHT) continue;
 
         for(int x=0;x<64;x++){
             int screenX = px + x;
-            if(screenX<0 || screenX>=PANEL_RES_X) continue;
+            if(screenX<0 || screenX>=WIDTH) continue;
 
             int idx = y*64 + x;
             uint8_t col = getPixel(img, idx);
@@ -146,11 +150,11 @@ void putimageFade(int px, int py, const unsigned char* img, float fade){
 
     for(int y=0;y<64;y++){
         int screenY = py + y;
-        if(screenY<0 || screenY>=PANEL_RES_Y) continue;
+        if(screenY<0 || screenY>=HEIGHT) continue;
 
         for(int x=0;x<64;x++){
             int screenX = px + x;
-            if(screenX<0 || screenX>=PANEL_RES_X) continue;
+            if(screenX<0 || screenX>=WIDTH) continue;
 
             int idx = y*64 + x;
             uint8_t col = getPixel(img, idx);
@@ -170,10 +174,10 @@ void putimageFade(int px, int py, const unsigned char* img, float fade){
 void putimageInvert(int px, int py, const unsigned char* img) {
     for (int y = 0; y < 64; y++) {
         int screenY = py + y;
-        if (screenY < 0 || screenY >= PANEL_RES_Y) continue;
+        if (screenY < 0 || screenY >= HEIGHT) continue;
         for (int x = 0; x < 64; x++) {
             int screenX = px + x;
-            if (screenX < 0 || screenX >= PANEL_RES_X) continue;
+            if (screenX < 0 || screenX >= WIDTH) continue;
             int idx = y * 64 + x;
             uint8_t col = getPixel(img, idx);
             if (col != 0) {
