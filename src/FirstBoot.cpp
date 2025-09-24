@@ -1,6 +1,6 @@
 #include "firstboot.h"
- 
- 
+
+
 //http://192.168.4.1
 
 
@@ -16,8 +16,8 @@ const char  CONFIG_PAGE[] PROGMEM= R"(
         .container { max-width: 600px; margin: 0 auto; background: white; padding: 20px; border-radius: 10px; }
         .form-group { margin: 15px 0; }
         label { display: block; margin-bottom: 5px; font-weight: bold; }
-        input[type="text"], input[type="password"], input[type="number"] { 
-            width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; 
+        input[type="text"], input[type="password"], input[type="number"] {
+            width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;
         }
         .pin-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         .btn { background: #4CAF50; color: white; padding: 12px 20px; border: none; border-radius: 4px; cursor: pointer; width: 100%; }
@@ -31,7 +31,7 @@ const char  CONFIG_PAGE[] PROGMEM= R"(
     <div class="container">
         <h1>ESP32 Configuration</h1>
         <p>Configure your WiFi and LED matrix pins</p>
-        
+
         <form id="configForm">
             <h2>WiFi Configuration</h2>
             <div class="form-group">
@@ -42,7 +42,7 @@ const char  CONFIG_PAGE[] PROGMEM= R"(
                 <label>WiFi Password:</label>
                 <input type="password" id="password" name="password">
             </div>
-            
+
             <h2>LED Matrix Pins Configuration (HUB75)</h2>
             <div class="pin-group">
                 <div class="form-group">
@@ -102,12 +102,12 @@ const char  CONFIG_PAGE[] PROGMEM= R"(
                     <input type="number" id="clk_pin" name="clk_pin" value="5" min="0" max="39">
                 </div>
             </div>
-            
+
             <div class="form-group">
                 <button type="button" class="btn" onclick="saveConfig() ">Save Configuration</button>
             </div>
         </form>
-        
+
         <div id="status"></div>
     </div>
 
@@ -117,17 +117,17 @@ const char  CONFIG_PAGE[] PROGMEM= R"(
             const form = document.getElementById('configForm');
             const formData = new FormData(form);
             const data = {};
-            
+
             for (let [key, value] of formData.entries()) {
                 data[key] = value;
             }
-            
+
             console.log('Sending data:', data);
-            
+
             // Show immediate feedback
             const status = document.getElementById('status');
             status.innerHTML = '<div class="status">Saving configuration...</div>';
-            
+
             fetch('/save', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -141,7 +141,7 @@ const char  CONFIG_PAGE[] PROGMEM= R"(
                 console.log('Result:', result);
                 if (result.success) {
                     status.innerHTML = '<div class="status success">Configuration saved! ESP32 will restart...</div>';
-                    setTimeout(() => { 
+                    setTimeout(() => {
                         status.innerHTML = '<div class="status success">Restarting... Please wait...</div>';
                     }, 3000);
                 } else {
@@ -163,7 +163,7 @@ const char  CONFIG_PAGE[] PROGMEM= R"(
 
 
 // Variables globales
-WebServer server(80);
+WebServer *server = nullptr;
 Preferences prefs;
 MatrixPins pins; // Global instance
 bool isFirstBoot = false;
@@ -172,7 +172,7 @@ bool configComplete = false;
 // Bouton de reset (GPIO 0 - bouton BOOT sur ESP32)
 #define RESET_BUTTON_PIN 0
  //#define RESET_BUTTON_PIN 5
- 
+
 
 // Vérifier si c'est le premier démarrage
 bool checkFirstBoot() {
@@ -195,14 +195,14 @@ void saveWiFiConfig(String ssid, String password) {
 void savePinConfig(MatrixPins& pins) {
     prefs.begin("esp32_config", false);
 
- 
+
     prefs.putInt("r1_pin", pins.R1_PIN);
     prefs.putInt("b1_pin", pins.B1_PIN);
     prefs.putInt("r2_pin", pins.R2_PIN);
     prefs.putInt("b2_pin", pins.B2_PIN);
     prefs.putInt("a_pin", pins.A_PIN);
     prefs.putInt("c_pin", pins.C_PIN);
-    prefs.putInt("clk_pin", pins.CLK_PIN); 
+    prefs.putInt("clk_pin", pins.CLK_PIN);
     prefs.putInt("oe_pin", pins.OE_PIN);
     prefs.putInt("g1_pin", pins.G1_PIN);
     prefs.putInt("g2_pin", pins.G2_PIN);
@@ -210,8 +210,8 @@ void savePinConfig(MatrixPins& pins) {
     prefs.putInt("b_pin", pins.B_PIN);
     prefs.putInt("d_pin", pins.D_PIN);
     prefs.putInt("lat_pin", pins.LAT_PIN);
-    
-    
+
+
     prefs.putBool("configured", true);
     prefs.end();
     Serial.println("Pins configuration saved");
@@ -222,7 +222,7 @@ MatrixPins loadPinConfig() {
     MatrixPins loadedPins;
     prefs.begin("esp32_config", true);
 
-  
+
     loadedPins.R1_PIN = prefs.getInt("r1_pin", 17);
     loadedPins.B1_PIN = prefs.getInt("b1_pin", 8);
     loadedPins.R2_PIN = prefs.getInt("r2_pin", 3);
@@ -233,13 +233,13 @@ MatrixPins loadPinConfig() {
     loadedPins.OE_PIN = prefs.getInt("oe_pin", 12);
     loadedPins.G1_PIN = prefs.getInt("g1_pin", 18);
     loadedPins.G2_PIN = prefs.getInt("g2_pin", 2);
-    loadedPins.E_PIN = prefs.getInt("e_pin", 13); 
+    loadedPins.E_PIN = prefs.getInt("e_pin", 13);
     loadedPins.B_PIN = prefs.getInt("b_pin", 11);
     loadedPins.D_PIN = prefs.getInt("d_pin", 4);
     loadedPins.LAT_PIN = prefs.getInt("lat_pin", 6);
-    
-   
-    
+
+
+
     prefs.end();
     return loadedPins;
 }
@@ -255,21 +255,21 @@ void loadWiFiConfig(String& ssid, String& password) {
 // Reset de la configuration
 void resetConfig() {
     prefs.begin("esp32_config", false);
- 
+
     prefs.putInt("r1_pin", pins.R1_PIN);
     prefs.putInt("b1_pin", pins.B1_PIN);
     prefs.putInt("r2_pin", pins.R2_PIN);
     prefs.putInt("b2_pin", pins.B2_PIN);
     prefs.putInt("a_pin", pins.A_PIN);
     prefs.putInt("c_pin", pins.C_PIN);
-    prefs.putInt("clk_pin", pins.CLK_PIN); 
+    prefs.putInt("clk_pin", pins.CLK_PIN);
     prefs.putInt("oe_pin", pins.OE_PIN);
     prefs.putInt("g1_pin", pins.G1_PIN);
     prefs.putInt("g2_pin", pins.G2_PIN);
     prefs.putInt("e_pin", pins.E_PIN);
     prefs.putInt("b_pin", pins.B_PIN);
     prefs.putInt("d_pin", pins.D_PIN);
-    prefs.putInt("lat_pin", pins.LAT_PIN);    
+    prefs.putInt("lat_pin", pins.LAT_PIN);
     prefs.putBool("configured", false);
 
     prefs.end();
@@ -294,96 +294,99 @@ int extractPinValue(String body, String pinName) {
 
 // Gestionnaires des requêtes web
 void handleRoot() {
-    server.send(200, "text/html", CONFIG_PAGE);
+    server->send(200, "text/html", CONFIG_PAGE);
 }
 
 void handleSave() {
     Serial.println("Save request received");
-    
-    if (server.method() == HTTP_POST) {
-        String body = server.arg("plain");
+
+    if (server->method() == HTTP_POST) {
+        String body = server->arg("plain");
          Serial.println("POST Body: " + body);
-        
+
         // Parse JSON simple
         String ssid = "";
         String password = "";
-        
+
         int ssidStart = body.indexOf("\"ssid\":\"") + 8;
         int ssidEnd = body.indexOf("\"", ssidStart);
         if (ssidStart > 7 && ssidEnd > ssidStart) {
             ssid = body.substring(ssidStart, ssidEnd);
         }
-        
+
         int passStart = body.indexOf("\"password\":\"") + 12;
         int passEnd = body.indexOf("\"", passStart);
         if (passStart > 11 && passEnd > passStart) {
             password = body.substring(passStart, passEnd);
         }
-        
+
         //Serial.println("SSID: " + ssid);
         //Serial.println("Password: " + password);
-        
+
         // Vérifier que les valeurs extraites sont valides
         int r1_val = extractPinValue(body, "r1_pin");
         int g1_val = extractPinValue(body, "g1_pin");
-        
+
         if (r1_val != -1) pins.R1_PIN = r1_val;
         if (g1_val != -1) pins.G1_PIN = g1_val;
-        
+
         // Sauvegarder tous les pins
         int b1_val = extractPinValue(body, "b1_pin");
         if (b1_val != -1) pins.B1_PIN = b1_val;
-        
+
         int r2_val = extractPinValue(body, "r2_pin");
         if (r2_val != -1) pins.R2_PIN = r2_val;
-        
+
         int g2_val = extractPinValue(body, "g2_pin");
         if (g2_val != -1) pins.G2_PIN = g2_val;
-        
+
         int b2_val = extractPinValue(body, "b2_pin");
         if (b2_val != -1) pins.B2_PIN = b2_val;
-        
+
         int a_val = extractPinValue(body, "a_pin");
         if (a_val != -1) pins.A_PIN = a_val;
-        
+
         int b_val = extractPinValue(body, "b_pin");
         if (b_val != -1) pins.B_PIN = b_val;
-        
+
         int c_val = extractPinValue(body, "c_pin");
         if (c_val != -1) pins.C_PIN = c_val;
-        
+
         int d_val = extractPinValue(body, "d_pin");
         if (d_val != -1) pins.D_PIN = d_val;
-        
+
         int e_val = extractPinValue(body, "e_pin");
         if (e_val != -1) pins.E_PIN = e_val;
-        
+
         int lat_val = extractPinValue(body, "lat_pin");
         if (lat_val != -1) pins.LAT_PIN = lat_val;
-        
+
         int oe_val = extractPinValue(body, "oe_pin");
         if (oe_val != -1) pins.OE_PIN = oe_val;
-        
+
         int clk_val = extractPinValue(body, "clk_pin");
         if (clk_val != -1) pins.CLK_PIN = clk_val;
-        
+
         if (ssid.length() > 0) {
             //Serial.println("Saving configuration...");
             saveWiFiConfig(ssid, password);
             savePinConfig(pins);
-            
-            server.send(200, "application/json", "{\"success\":true}");
+
+            server->send(200, "application/json", "{\"success\":true}");
              Serial.println("Configuration saved, restarting...");
-            
+
+            delete server;
+            server = nullptr;
+
             delay(2000);
             ESP.restart();
         } else {
              Serial.println("SSID required");
-            server.send(400, "application/json", "{\"success\":false,\"message\":\"SSID required\"}");
+            server->send(400, "application/json", "{\"success\":false,\"message\":\"SSID required\"}");
         }
     } else {
         Serial.println("Invalid method");
-        server.send(405, "application/json", "{\"success\":false,\"message\":\"Method not allowed\"}");
+        server->send(405, "application/json", "{\"success\":false,\"message\":\"Method not allowed\"}");
     }
 }
 
@@ -394,16 +397,17 @@ void createAccessPoint() {
      Serial.println("Access point created");
     Serial.print("IP Address: ");
      Serial.println(WiFi.softAPIP());
-    
-    server.on("/", handleRoot);
-    server.on("/save", handleSave);
-    server.begin();
-    
+
+    server = new WebServer(80);
+    server->on("/", handleRoot);
+    server->on("/save", handleSave);
+    server->begin();
+
      Serial.println("Web server started");
      Serial.println("Connect to 'ESP32-Config' network and go to http://192.168.4.1");
 }
 
- 
+
  static unsigned long lastPressTime = 0;
     static bool buttonPressed = false;
     static int pressCount = 0;
@@ -413,7 +417,7 @@ void createAccessPoint() {
 
 // Improved reset button check with proper debouncing
 void checkResetButton2() {
-   
+
 
     if (digitalRead(RESET_BUTTON_PIN) == LOW) {
         if (!buttonPressed && (millis() - lastPressTime > debounceDelay)) {
@@ -421,12 +425,12 @@ void checkResetButton2() {
             lastPressTime = millis();
             pressCount++;
             Serial.println("Button press detected. Count: " + String(pressCount));
-            
+
             // Reset counter if too much time passed between presses
             if (pressCount > 1 && (millis() - lastPressTime) > doubleClickTimeout) {
                 pressCount = 1;
             }
-            
+
             // Check for double press
             if (pressCount >= requiredPresses) {
                 //Serial.println("Double press detected - resetting configuration...");
@@ -436,7 +440,7 @@ void checkResetButton2() {
         }
     } else {
         buttonPressed = false;
-        
+
         // Reset counter if timeout reached
         if (pressCount > 0 && (millis() - lastPressTime) > doubleClickTimeout) {
             pressCount = 0;
@@ -448,7 +452,7 @@ void checkResetButton2() {
 // Vérifier le bouton de reset
 void checkResetButton() {
     static bool buttonPressed = false;
-    
+
     if (digitalRead(RESET_BUTTON_PIN) == LOW) {
         if (!buttonPressed) {
             buttonPressed = true;
@@ -464,13 +468,13 @@ void checkResetButton() {
 int initFirstBoot() {
     Serial.begin(115200);
      Serial.println("ESP32 Starting...");
-    
+
     // Configurer le bouton de reset
     pinMode(RESET_BUTTON_PIN, INPUT_PULLUP);
-    
+
     // Vérifier si c'est le premier démarrage
     isFirstBoot = checkFirstBoot();
-    
+
     if (isFirstBoot) {
          Serial.println("First boot - configuration mode");
         createAccessPoint();
@@ -485,8 +489,8 @@ int initFirstBoot() {
 
 // Fonction principale à appeler dans la loop
 void handleFirstBoot() {
-    if (!configComplete) {
-        server.handleClient();
+    if (server != nullptr && !configComplete) {
+        server->handleClient();
         checkResetButton();
         delay(10);
     }
@@ -501,12 +505,3 @@ MatrixPins getMatrixPins() {
 bool isConfigComplete() {
     return configComplete;
 }
-
-
-
-
-
-
-
-
-

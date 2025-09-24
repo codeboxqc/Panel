@@ -17,26 +17,26 @@
 void plasmaAnimation(unsigned long time) {
     static unsigned long lastUpdate = 0;
     static float offset = 0.0;
-    
+
     if (time - lastUpdate > 30) { // Update every 30ms for smooth animation
         lastUpdate = time;
         offset += 0.02; // Increment for animation
-        
+
         for (int x = 0; x < WIDTH; x++) {
             for (int y = 0; y < HEIGHT; y++) {
                 // Calculate plasma values using multiple sine waves
                 float value1 = sin((x * 0.1) + offset);
                 float value2 = sin((y * 0.1) + offset * 0.7);
                 float value3 = sin((x * 0.15 + y * 0.1) + offset * 1.3);
-                float value4 = sin(sqrt((x - WIDTH/2) * (x - WIDTH/2) + 
+                float value4 = sin(sqrt((x - WIDTH/2) * (x - WIDTH/2) +
                                        (y - HEIGHT/2) * (y - HEIGHT/2)) * 0.1 + offset);
-                
+
                 // Combine the values
                 float plasma = (value1 + value2 + value3 + value4) * 0.25;
-                
+
                 // Map to HSV color space for vibrant colors
                 float hue = fmod(plasma * 2.0 + offset, 1.0);
-                
+
                 // Convert HSV to RGB
                 float r, g, b;
                 hue *= 6.0;
@@ -45,7 +45,7 @@ void plasmaAnimation(unsigned long time) {
                 float p = 0.0;
                 float q = 1.0 - f;
                 float t = f;
-                
+
                 switch (i % 6) {
                     case 0: r = 1.0; g = t; b = p; break;
                     case 1: r = q; g = 1.0; b = p; break;
@@ -54,24 +54,24 @@ void plasmaAnimation(unsigned long time) {
                     case 4: r = t; g = p; b = 1.0; break;
                     case 5: r = 1.0; g = p; b = q; break;
                 }
-                
+
                 // Scale to 0-255 and draw pixel
                 uint8_t red = (uint8_t)(r * 255);
                 uint8_t green = (uint8_t)(g * 255);
                 uint8_t blue = (uint8_t)(b * 255);
-                
+
                 dma_display->drawPixel(x, y, dma_display->color565(red, green, blue));
             }
         }
     }
 }
 
- 
 
 
 
 
- 
+
+
 
 // HSV to RGB conversion function for 16-bit color (R5G6B5)
 uint16_t hsvToRgb(float h, float s, float v) {
@@ -80,7 +80,7 @@ uint16_t hsvToRgb(float h, float s, float v) {
     float p = v * (1 - s);
     float q = v * (1 - f * s);
     float t = v * (1 - (1 - f) * s);
-    
+
     float r, g, b;
     switch (i % 6) {
         case 0: r = v; g = t; b = p; break;
@@ -90,7 +90,7 @@ uint16_t hsvToRgb(float h, float s, float v) {
         case 4: r = t; g = p; b = v; break;
         case 5: r = v; g = p; b = q; break;
     }
-    
+
     // Convert to 16-bit color (5 bits red, 6 bits green, 5 bits blue)
     return ((uint16_t)(r * 31) << 11) | ((uint16_t)(g * 63) << 5) | (uint16_t)(b * 31);
 }
@@ -103,7 +103,7 @@ uint32_t fastHSVtoRGB(float h, float s, float v) {
     float p = v * (1.0f - s);
     float q = v * (1.0f - s * f);
     float t = v * (1.0f - s * (1.0f - f));
-    
+
     float r, g, b;
     switch (i % 6) {
         case 0: r = v; g = t; b = p; break;
@@ -113,7 +113,7 @@ uint32_t fastHSVtoRGB(float h, float s, float v) {
         case 4: r = t; g = p; b = v; break;
         case 5: r = v; g = p; b = q; break;
     }
-    
+
     return dma_display->color565((uint8_t)(r * 255), (uint8_t)(g * 255), (uint8_t)(b * 255));
 }
 
@@ -129,11 +129,11 @@ uint16_t dynamicColor(float x, float y, float time) {
     float hue = fmod((x + y) * 0.01 + time * 0.0001, 1.0);
     float saturation = 0.8 + 0.2 * sin(time * 0.0005);
     float value = 0.7 + 0.3 * cos(time * 0.0003);
-    
+
     return hsvToRgb(hue, saturation, value);
 }
 
- 
+
 
 //   Enhanced Pixel Rain with full color range
 void pixelRainEffect(unsigned long time) { //ok
@@ -142,10 +142,10 @@ void pixelRainEffect(unsigned long time) { //ok
     static int colLength[WIDTH];
     static uint16_t colColors[WIDTH]; // Store full colors instead of palette indices
     static unsigned long lastUpdate = 0;
-    
+
     if (time - lastUpdate > 50) {
         lastUpdate = time;
-        
+
         // Fade the screen by drawing a semi-transparent black overlay
         for (int x = 0; x < WIDTH; x++) {
             for (int y = 0; y < HEIGHT; y++) {
@@ -155,7 +155,7 @@ void pixelRainEffect(unsigned long time) { //ok
                 }
             }
         }
-        
+
         // Update columns
         for (int x = 0; x < WIDTH; x++) {
             if (random(100) < 5) { // 5% chance to start new drop
@@ -164,11 +164,11 @@ void pixelRainEffect(unsigned long time) { //ok
                 colLength[x] = random(5, 15);
                 colColors[x] = dynamicColor(x, 0, time); // Dynamic color based on position
             }
-            
+
             if (columns[x] < HEIGHT) {
                 // Draw new drop head (brightest part)
                 dma_display->drawPixel(x, columns[x], colColors[x]);
-                
+
                 // Draw trail with fading intensity
                 for (int i = 1; i < colLength[x]; i++) {
                     if (columns[x] - i >= 0) {
@@ -178,18 +178,18 @@ void pixelRainEffect(unsigned long time) { //ok
                         uint8_t r = (fadedColor >> 11) & 0x1F;
                         uint8_t g = (fadedColor >> 5) & 0x3F;
                         uint8_t b = fadedColor & 0x1F;
-                        
+
                         // Apply fade based on distance from head
                         float fadeFactor = 1.0 - (i / (float)colLength[x]);
                         r = (uint8_t)(r * fadeFactor);
                         g = (uint8_t)(g * fadeFactor);
                         b = (uint8_t)(b * fadeFactor);
-                        
+
                         uint16_t trailColor = (r << 11) | (g << 5) | b;
                         dma_display->drawPixel(x, columns[x] - i, trailColor);
                     }
                 }
-                
+
                 columns[x] += colSpeed[x];
             } else {
                 columns[x] = HEIGHT + 10; // Reset when off screen
@@ -209,10 +209,10 @@ void rain16(unsigned long time) { //ok
     static int colSpeed[WIDTH];
     static int colLength[WIDTH];
     static unsigned long lastUpdate = 0;
-    
+
     if (time - lastUpdate > 50) {
         lastUpdate = time;
-        
+
         // Fade the screen by drawing a semi-transparent black overlay
         for (int x = 0; x < WIDTH; x++) {
             for (int y = 0; y < HEIGHT; y++) {
@@ -222,7 +222,7 @@ void rain16(unsigned long time) { //ok
                 }
             }
         }
-        
+
         // Update columns
         for (int x = 0; x < WIDTH; x++) {
             if (random(100) < 5) { // 5% chance to start new drop
@@ -230,11 +230,11 @@ void rain16(unsigned long time) { //ok
                 colSpeed[x] = random(1, 4);
                 colLength[x] = random(5, 15);
             }
-            
+
             if (columns[x] < HEIGHT) {
                 // Draw new drop head
                 dma_display->drawPixel(x, columns[x], palette[10]); // Bright green
-                
+
                 // Draw trail
                 for (int i = 1; i < colLength[x]; i++) {
                     if (columns[x] - i >= 0) {
@@ -244,7 +244,7 @@ void rain16(unsigned long time) { //ok
                         }
                     }
                 }
-                
+
                 columns[x] += colSpeed[x];
             } else {
                 columns[x] = HEIGHT + 10; // Reset when off screen
@@ -253,9 +253,9 @@ void rain16(unsigned long time) { //ok
     }
 }
 
- 
 
- 
+
+
 void  Rain (unsigned long time) { //ok
     static struct Pixel {
         float x, y;
@@ -263,10 +263,10 @@ void  Rain (unsigned long time) { //ok
         uint8_t color;
         bool active;
     } pixels[60];
-    
+
     static unsigned long lastSpawn = 0;
     static unsigned long lastFade = 0;
-    
+
     // Fade the screen occasionally
     if (time - lastFade > 100) {
         lastFade = time;
@@ -277,7 +277,7 @@ void  Rain (unsigned long time) { //ok
             dma_display->drawPixel(x, y, 0);
         }
     }
-    
+
     // Spawn new pixels
     if (time - lastSpawn > 35) {
         lastSpawn = time;
@@ -294,7 +294,7 @@ void  Rain (unsigned long time) { //ok
             }
         }
     }
-    
+
     // Update and draw pixels
     for (int i = 0; i <60; i++) {
         if (pixels[i].active) {
@@ -319,10 +319,10 @@ void  Rain (unsigned long time) { //ok
 void initFlame(Flame* f) {
     f->width = WIDTH;
     f->height = HEIGHT;
-    f->buffer = PROGMEM(uint8_t*)malloc(WIDTH * HEIGHT);
-    f->fire_buffer = PROGMEM(uint8_t*)malloc(WIDTH * HEIGHT);
-    memset(f->buffer, 0, WIDTH * HEIGHT);
-    memset(f->fire_buffer, 0, WIDTH * HEIGHT);
+    f->buffer = (uint8_t*)malloc(f->width * f->height);
+    f->fire_buffer = (uint8_t*)malloc(f->width * f->height);
+    memset(f->buffer, 0, f->width * f->height);
+    memset(f->fire_buffer, 0, f->width * f->height);
 }
 
 void updateFlame(Flame* f) {
@@ -373,17 +373,17 @@ void drawFlame(Flame* f) { //ok
 }
 
 
-  
- 
+
+
 // ====================================================
 // plasma
 // ====================================================
 
 void initPlasma(Plasma* plasma) {
-    plasma->width  = 256;
-    plasma->height = 256;
-    plasma->body   = (uint8_t*)malloc(256 * 256);
-    memset(plasma->body, 0, 256 * 256);
+    plasma->width  = WIDTH;
+    plasma->height = HEIGHT;
+    plasma->body   = (uint8_t*)malloc(WIDTH * HEIGHT);
+    memset(plasma->body, 0, WIDTH * HEIGHT);
 
     for (int i = 0; i < 256; i++) {
         plasma->cosinus[i] = (int)(30 * cos(i * (PI / 128)));
@@ -462,13 +462,13 @@ void drawPlasma(Plasma* plasma) {
     }
 }
 
- 
+
 
 // ====================================================
-//starfieldEffect 
+//starfieldEffect
 // ====================================================
 // Starfield globals
- 
+
 static float lx[NB], ly[NB], lz[NB]; // Star positions
 static float vx[NB], vy[NB], vz[NB]; // Star velocities
 static int xd, yd; // Projected 2D coordinates
@@ -518,7 +518,7 @@ void starfieldEffect(unsigned long time) { //ok
                 brightness = brightness > 255 ? 255 : brightness;
                 brightness = brightness < 16 ? 16 : brightness; // Avoid too dim
                 dma_display->drawPixel(xd, yd, palette256[brightness]);
-                
+
                 // Draw trail
                 for (int t = 1; t <= TRAIL_LENGTH; t++) {
                     // Calculate trail position
@@ -560,7 +560,7 @@ void initMatrixRain(MatrixRain* rain) {
     rain->position[i] = random(HEIGHT * 2); // Random start position
     rain->last_update[i] = 0;
     rain->intensity[i] = 200 + random(55);  // Brightness
-    
+
     // Initialize random characters for this column (0-9, A-Z)
     for (int j = 0; j < 32; j++) {
       rain->chars[i][j] = random(36);
@@ -576,13 +576,13 @@ void initMatrixRain(MatrixRain* rain) {
 void updateMatrixRain(MatrixRain* rain) {
   static uint32_t last_time = 0;
   uint32_t current_time = millis();
-  
+
   for (int x = 0; x < WIDTH; x++) {
     // Update this column based on its speed
     if (current_time - rain->last_update[x] > rain->speed[x]) {
       rain->position[x] = (rain->position[x] + 1) % (HEIGHT + rain->length[x] + 10);
       rain->last_update[x] = current_time;
-      
+
       // Occasionally change properties
       if (random(100) < 2) {
         rain->speed[x] = 5 + random(20);
@@ -607,21 +607,21 @@ void updateMatrixRain(MatrixRain* rain) {
 void drawMatrixRain(MatrixRain* rain) { //ok
   // Clear screen with dark green
   dma_display->fillScreen(dma_display->color565(0, 10, 0));
-  
+
   for (int x = 0; x < WIDTH; x++) {
     int start_pos = rain->position[x];
-    
+
     for (int i = 0; i < rain->length[x]; i++) {
       int y_pos = start_pos - i;
-      
+
       if (y_pos >= 0 && y_pos < HEIGHT) {
         // Calculate brightness (fade out toward the tail)
         uint8_t brightness = rain->intensity[x] * (rain->length[x] - i) / rain->length[x];
-        
+
         // Head of the rain is bright green
         if (i == 0) {
           dma_display->drawPixel(x, y_pos, dma_display->color565(0, 255, 0));
-        } 
+        }
         // Body fades from green to dark green
         else {
           uint8_t green = brightness;
@@ -633,9 +633,9 @@ void drawMatrixRain(MatrixRain* rain) { //ok
 }
 
 
- 
 
- 
+
+
 
 
 
@@ -651,7 +651,7 @@ uint8_t color_mode = 0;
 
 void initParticleSystem() {
   time_counter = 0;
-  
+
   for (int i = 0; i < NUM_PARTICLES; i++) {
     particles[i].x = random(WIDTH);
     particles[i].y = random(HEIGHT);
@@ -668,30 +668,30 @@ void checkParticleCollision(Particle* p1, Particle* p2) {
   float dy = p2->y - p1->y;
   float distance = sqrt(dx * dx + dy * dy);
   float min_distance = p1->size + p2->size;
-  
+
   if (distance < min_distance && distance > 0) {
     // Collision detected - calculate rebound
     float angle = atan2(dy, dx);
     float sin_angle = sin(angle);
     float cos_angle = cos(angle);
-    
+
     // Rotate velocity vectors
     float vx1_rot = p1->vx * cos_angle + p1->vy * sin_angle;
     float vy1_rot = p1->vy * cos_angle - p1->vx * sin_angle;
     float vx2_rot = p2->vx * cos_angle + p2->vy * sin_angle;
     float vy2_rot = p2->vy * cos_angle - p2->vx * sin_angle;
-    
+
     // Exchange x velocities (elastic collision)
     float temp = vx1_rot;
     vx1_rot = vx2_rot;
     vx2_rot = temp;
-    
+
     // Rotate back
     p1->vx = vx1_rot * cos_angle - vy1_rot * sin_angle;
     p1->vy = vy1_rot * cos_angle + vx1_rot * sin_angle;
     p2->vx = vx2_rot * cos_angle - vy2_rot * sin_angle;
     p2->vy = vy2_rot * cos_angle + vx2_rot * sin_angle;
-    
+
     // Separate particles to prevent sticking
     float overlap = min_distance - distance + 0.5;
     p1->x -= overlap * cos_angle * 0.5;
@@ -703,19 +703,19 @@ void checkParticleCollision(Particle* p1, Particle* p2) {
 
 void updateParticleSystem() {
   time_counter += 0.02;
-  
+
   // Update particle positions and check screen boundaries
   for (int i = 0; i < NUM_PARTICLES; i++) {
     Particle* p = &particles[i];
-    
+
     // Add subtle wave motion
     p->vx += sin(time_counter * 0.5 + p->y * 0.1) * 0.1;
     p->vy += cos(time_counter * 0.4 + p->x * 0.1) * 0.1;
-    
+
     // Update position
     p->x += p->vx;
     p->y += p->vy;
-    
+
     // Screen boundary collision - bounce with energy loss
     if (p->x < p->size) {
       p->x = p->size;
@@ -733,19 +733,19 @@ void updateParticleSystem() {
       p->y = HEIGHT - p->size - 1;
       p->vy = -p->vy * 0.9;
     }
-    
+
     // Apply slight damping
     p->vx *= 0.995;
     p->vy *= 0.995;
   }
-  
+
   // Check particle-particle collisions
   for (int i = 0; i < NUM_PARTICLES; i++) {
     for (int j = i + 1; j < NUM_PARTICLES; j++) {
       checkParticleCollision(&particles[i], &particles[j]);
     }
   }
-  
+
   // Occasionally change color mode
   if (random(1000) < 1) {
     color_mode = (color_mode + 1) % 4;
@@ -755,33 +755,33 @@ void updateParticleSystem() {
 void drawParticleSystem() { //ok
   // Clear with very dark background for trail effect
   dma_display->fillRect(0, 0, WIDTH, HEIGHT, dma_display->color565(1, 1, 2));
-  
+
   for (int i = 0; i < NUM_PARTICLES; i++) {
     Particle* p = &particles[i];
-    
+
     // Get color from current palette
     uint32_t color_val = palettes[color_mode][p->color_index];
     uint8_t r = (color_val >> 16) & 0xFF;
     uint8_t g = (color_val >> 8) & 0xFF;
     uint8_t b = color_val & 0xFF;
-    
+
     // Draw the particle with size
     if (p->size == 1) {
       dma_display->drawPixel(p->x, p->y, dma_display->color565(r, g, b));
     } else {
       dma_display->fillCircle(p->x, p->y, p->size, dma_display->color565(r, g, b));
     }
-    
+
     // Draw subtle motion trail
     for (int j = 1; j <= 2; j++) {
       int trail_x = p->x - p->vx * j;
       int trail_y = p->y - p->vy * j;
-      
+
       if (trail_x >= 0 && trail_x < WIDTH && trail_y >= 0 && trail_y < HEIGHT) {
         uint8_t alpha = 100 - j * 40;
-        dma_display->drawPixel(trail_x, trail_y, 
-          dma_display->color565(r * alpha / 255, 
-                               g * alpha / 255, 
+        dma_display->drawPixel(trail_x, trail_y,
+          dma_display->color565(r * alpha / 255,
+                               g * alpha / 255,
                                b * alpha / 255));
       }
     }
@@ -806,7 +806,7 @@ void nextColorMode() {
 float fastSin(float x) {
     // Wrap x to [0, 2*PI] - much faster than fmod
     x = x - 6.283185307f * floor(x / 6.283185307f);
-    
+
     // Cubic approximation for sine
     if (x < 3.141592654f) {
         return (4.0f * x * (3.141592654f - x)) / (9.869604401f);
@@ -841,15 +841,15 @@ float fastAtan2(float y, float x) {
     float a = min(abs_x, abs_y) / max(abs_x, abs_y);
     float s = a * a;
     float r = ((-0.0464964749f * s + 0.15931422f) * s - 0.327622764f) * s * a + a;
-    
+
     if (abs_y > abs_x) r = 1.570796327f - r;
     if (x < 0) r = 3.141592654f - r;
     if (y < 0) r = -r;
-    
+
     return r;
 }
 
- 
+
 
 // Fast floor function
 float fastFloor(float x) {
@@ -877,39 +877,39 @@ float fastMax(float a, float b) { return a > b ? a : b; }
 void fastFractalPlasma(unsigned long time) {
     static unsigned long lastUpdate = 0;
     static float timeOffset = 0.0;
-    
+
     if (time - lastUpdate > 16) { // ~60 FPS
         lastUpdate = time;
         timeOffset += 0.04;
-        
+
         // Pre-calculate some values for speed
         float halfW = WIDTH * 0.5f;
         float halfH = HEIGHT * 0.5f;
         float timeFactor1 = timeOffset * 1.3f;
         float timeFactor2 = timeOffset * 0.7f;
         float timeFactor3 = timeOffset * 1.7f;
-        
+
         for (int x = 0; x < WIDTH; x++) {
             float fx = (float)x;
             for (int y = 0; y < HEIGHT; y++) {
                 float fy = (float)y;
-                
+
                 // Fast fractal plasma calculation using optimized trig approximations
                 float dx = fx - halfW;
                 float dy = fy - halfH;
                 float dist = fastSqrt(dx*dx + dy*dy) * 0.1f;
-                
+
                 // Fast sine approximations using polynomial curves
-                float plasma = 
+                float plasma =
                     fastSin(fx * 0.08f + timeFactor1) * 0.25f +
                     fastSin(fy * 0.09f + timeFactor2) * 0.25f +
                     fastSin((fx + fy) * 0.05f + timeFactor3) * 0.25f +
                     fastSin(dist + timeOffset) * 0.25f;
-                
+
                 // Map to vibrant colors with fast HSV conversion
                 float hue = fmod(plasma * 2.0f + timeOffset * 0.5f, 1.0f);
                 uint32_t rgb = fastHSVtoRGB(hue, 1.0f, 1.0f);
-                
+
                 dma_display->drawPixel(x, y, rgb);
             }
         }
@@ -1029,40 +1029,40 @@ void switchFractalPlasma(unsigned long time) {
     static float timeOffset = 0.0;
     static int paletteMode = 0;
     static unsigned long lastPaletteChange = 0;
-    
+
     if (time - lastUpdate > 16) { // ~60 FPS
         lastUpdate = time;
         timeOffset += 0.04;
-        
+
         // Change palette every 5 seconds *10
         if (time - lastPaletteChange > 5000*10) {
             lastPaletteChange = time;
             paletteMode = (paletteMode + 1) % 6;
         }
-        
+
         // Pre-calculate some values for speed
         float halfW = WIDTH * 0.5f;
         float halfH = HEIGHT * 0.5f;
         float timeFactor1 = timeOffset * 1.3f;
         float timeFactor2 = timeOffset * 0.7f;
         float timeFactor3 = timeOffset * 1.7f;
-        
+
         for (int x = 0; x < WIDTH; x++) {
             float fx = (float)x;
             for (int y = 0; y < HEIGHT; y++) {
                 float fy = (float)y;
-                
+
                 // Fast fractal plasma calculation
                 float dx = fx - halfW;
                 float dy = fy - halfH;
                 float dist = fastSqrt(dx*dx + dy*dy) * 0.1f;
-                
-                float plasma = 
+
+                float plasma =
                     fastSin(fx * 0.08f + timeFactor1) * 0.25f +
                     fastSin(fy * 0.09f + timeFactor2) * 0.25f +
                     fastSin((fx + fy) * 0.05f + timeFactor3) * 0.25f +
                     fastSin(dist + timeOffset) * 0.25f;
-                
+
                 // Apply different color palettes
                 uint32_t color;
                 switch (paletteMode) {
@@ -1085,7 +1085,7 @@ void switchFractalPlasma(unsigned long time) {
                         color = paletteMono(plasma);
                         break;
                 }
-                
+
                 dma_display->drawPixel(x, y, color);
             }
         }
@@ -1098,7 +1098,7 @@ void switchFractalPlasma(unsigned long time) {
 
 /////////////////////////////////////////////////////////////////////////////////
 
-  
+
 
 
 
@@ -1152,40 +1152,40 @@ void fastFractalMorph(unsigned long time) {
     static float timeOffset = 0.0;
     static uint8_t colorMode = 0;
     static unsigned long lastModeChange = 0;
-    
+
     // Update at ~30 FPS to reduce CPU/memory load
     if (time - lastUpdate < 10) return;
     lastUpdate = time;
     timeOffset += 0.05f;
-    
+
     // Change color mode every 5 seconds
     if (time - lastModeChange > 5000*3) {
         lastModeChange = time;
         colorMode = (colorMode + 1) & 7; // Bitwise mod 8
     }
-    
+
     const float halfW = WIDTH * 0.5f;
     const float halfH = HEIGHT * 0.5f;
-    
+
     // Precompute time-based weights to reduce redundant calculations
     float weight1 = 0.3f + 0.2f * fastSin(timeOffset * 0.4f);
     float weight2 = 0.3f + 0.2f * fastSin(timeOffset * 0.6f + 1.57f);
     float weight3 = 0.3f + 0.2f * fastSin(timeOffset * 0.8f + 3.14f);
     float weightSum = weight1 + weight2 + weight3;
-    
+
     for (int x = 0; x < WIDTH; x++) {
         float fx = (float)x - halfW;
         for (int y = 0; y < HEIGHT; y++) {
             float fy = (float)y - halfH;
-            
+
             // Use only three patterns to reduce memory and computation
             float pattern1 = fastFractalNoise(fx * 0.1f, fy * 0.1f, timeOffset * 0.3f);
             float pattern2 = fastFractalCircles(fx, fy, timeOffset * 0.5f);
             float pattern3 = fastFractalSpiral(fx, fy, timeOffset * 0.7f);
-            
+
             // Combine patterns with precomputed weights
             float fractal = (pattern1 * weight1 + pattern2 * weight2 + pattern3 * weight3) / weightSum;
-            
+
             // Get color and draw pixel
             uint32_t color = getFractalColor(fractal, timeOffset, x, y, colorMode);
             dma_display->drawPixel(x, y, color);
@@ -1218,11 +1218,11 @@ float easeInOutExpo(float x) {
     if (x < 0.5f) return powf(2.0f, 20.0f * x - 10.0f) / 2.0f;
     return (2.0f - powf(2.0f, -20.0f * x + 10.0f)) / 2.0f;
 }
- 
+
 // Helper function to draw filled rectangle optimized
 void drawFilledRect(int x, int y, int w, int h, uint16_t color) {
    if (w <= 0 || h <= 0) return;
-  
+
     dma_display->fillRect(x, y, w, h, color);  // Assume library supports
 }
 
@@ -1259,7 +1259,7 @@ void vanGoghPaintAnimation(unsigned long time) {
                 cy[idx] = j * w + w / 2.0f;
                 cx0[idx] = cx[idx];
                 cy0[idx] = cy[idx];
-                
+
                 // Randomize initial colors and pre-convert to 16-bit
                 int colorIndices[10] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
                 for (int k = 9; k > 0; k--) {
@@ -1281,12 +1281,12 @@ void vanGoghPaintAnimation(unsigned long time) {
         initialized = true;
     }
 
-    
+
     if (time - lastUpdate > 12) {
         lastUpdate = time;
         offset += 0.02f;
 
-        //  clear screen  
+        //  clear screen
         if (needsFullRedraw) {
             for (int x = 0; x < WIDTH; x++) {
                 for (int y = 0; y < HEIGHT; y++) {
@@ -1305,7 +1305,7 @@ void vanGoghPaintAnimation(unsigned long time) {
             for (int j = 0; j < c; j++) {
                 float prevCx = cx[idx];
                 float prevCy = cy[idx];
-                
+
                 // Update movement
                 if (t[idx] >= 0 && t[idx] < t1) {
                     float n = t[idx] / (float)t1;
@@ -1349,10 +1349,10 @@ void vanGoghPaintAnimation(unsigned long time) {
                     int cellY = (int)(j * w);
                     int cellW = (int)w + 1; // Add 1 to prevent gaps
                     int cellH = (int)w + 1;
-                    
+
                     // Clear cell background
                     drawFilledRect(cellX, cellY, cellW, cellH, 0);
-                    
+
                     // Calculate rectangle positions
                     float xx = i * w + w / 2.0f - w / 2.0f;
                     float yy = j * w + w / 2.0f - w / 2.0f;
@@ -1397,7 +1397,7 @@ void vanGoghPaintAnimation(unsigned long time) {
                         drawFilledRect(x4, y4, w4, h4, cols[idx][3]);
                     }
                 }
-                
+
                 idx++;
             }
         }
@@ -1405,17 +1405,17 @@ void vanGoghPaintAnimation(unsigned long time) {
 }
 
 
-  
 
 
- 
 
 
- 
+
+
+
 
 void Jetstream(float t) {//ok
- 
-  
+
+
   const int W = 64, H = 64;
   const int numLines = 36;
   const float radius = 28.0f;
@@ -1439,18 +1439,18 @@ void Jetstream(float t) {//ok
     uint16_t color = dma_display->color565(r, g, b);
 
      dma_display->drawPixel((int)x1/2+16, (int)y1/2+16,color );
-     
 
-    // Draw radial line 
+
+    // Draw radial line
     int mx = (int)((x1 + x2) / 2);
     int my = (int)((y1 + y2) / 2);
     dma_display->drawPixel((int)x1, (int)y1, color);
     dma_display->drawPixel((int)x2, (int)y2, color);
 
-    
+
 
     dma_display->drawPixel(mx, my, color);
-     
+
   }
 }
 
@@ -1516,7 +1516,7 @@ void Pillars(float t) { //ok
 
 
 
-  
+
 void RadialGlow(uint32_t time) {
   const int W = 64, H = 64;
   static uint8_t heat[W][H];
@@ -1580,7 +1580,7 @@ void RadialGlow(uint32_t time) {
   }
 }
 
- 
+
 
 
 
@@ -1590,7 +1590,7 @@ float lerp(float a, float b, float amt) {
 
 
 void RaymarchGlow(float t) {  //ok
-  
+
   const int grid = 6;
   const int maxForms = grid * grid;
   const float cellSize = WIDTH / grid;
@@ -1671,15 +1671,15 @@ void RaymarchGlow(float t) {  //ok
 
 
 
- 
-  
 
 
 
- 
+
+
+
   void TronMatrixPulse(float t) { //ok
-  
-  
+
+
   const int MAX_TYPES = 4;
   const int MAX_POINTS = 8;
   const float maxSpeed = 0.3;
@@ -1752,10 +1752,10 @@ void RaymarchGlow(float t) {  //ok
 
       // Draw pixel
       dma_display->drawPixel((int)p.x, (int)p.y, p.color);
-       
+
     }
   }
- 
+
 
 }
 
@@ -1811,22 +1811,22 @@ void fireAnimation(unsigned long time) { //ok
     static uint16_t heat  [WIDTH][HEIGHT];
     static unsigned long lastUpdate = 0;
     static unsigned long lastSpread = 0;
-    
+
     if (time - lastUpdate > 50) {
         lastUpdate = time;
-        
+
         // Generate rising heat
         for (int x = 0; x < WIDTH; x++) {
             // Add random heat to the bottom row
             heat[x][HEIGHT-1] = random(150, 256);
-            
+
             // Make the heat rise and cool
             for (int y = 0; y < HEIGHT; y++) {
                 // Heat rises and cools
                 if (y > 0) {
                     heat[x][y-1] = constrain(heat[x][y] - random(10, 30), 0, 255);
                 }
-                
+
                 // Map heat to color
                 uint8_t intensity = heat[x][y];
                 if (intensity > 0) {
@@ -1839,7 +1839,7 @@ void fireAnimation(unsigned long time) { //ok
                 }
             }
         }
-        
+
         // Occasionally add bigger flames
         if (random(100) < 20) {
             int x = random(WIDTH);
@@ -1849,11 +1849,11 @@ void fireAnimation(unsigned long time) { //ok
             }
         }
     }
-    
+
     // Make the fire spread sideways occasionally
     if (time - lastSpread > 100) {
         lastSpread = time;
-        
+
         for (int x = 1; x < WIDTH-1; x++) {
             for (int y = HEIGHT-2; y < HEIGHT; y++) {
                 if (heat[x][y] > 100) {
@@ -1875,11 +1875,11 @@ void plasmaEffect(unsigned long time) { //ok
 
     for (int x = 0; x < WIDTH; x++) {
         for (int y = 0; y < HEIGHT; y++) {
-            
+
             float val = fastSin(x * 0.1f + offset) + fastCos(y * 0.1f + offset * 0.7f) +
                         fastSin((x + y) * 0.05f + offset * 1.3f);
             uint8_t col = (uint8_t)((val + 3.0f) / 6.0f * 15.0f) + 1;
-             
+
             dma_display->drawPixel(x, y, fastHSVtoRGB((float)col / 16.0f, 1.0f, 1.0f));
         }
     }
