@@ -6,6 +6,9 @@ ESP32-S3-WROOM Dual-core 32-bit 240 MHz
 ESP32 LED Matrix Display Project README
 This project is an ESP32-based firmware for driving HUB75 LED matrix panels (e.g., 64x64 RGB LED matrices). It includes features like:
 
+
+double click button on esp32 reset password
+
 First-boot configuration mode for WiFi and pin setup via a web interface.
 Display effects (e.g., plasma, fire, rain, time display).
 Time synchronization via NTP or HTTP.
@@ -176,9 +179,11 @@ Open Web Configuration Page:
 Open a web browser (Chrome/Firefox).
 Go to: http://192.168.4.1
 You should see the "ESP32 Configuration" page with WiFi and Pin fields.
+![Untitled](https://github.com/user-attachments/assets/627e9277-7cfa-4f0b-b33d-5313c6a48fd5)
 
  ![11](https://github.com/user-attachments/assets/8cd0688f-fd29-48e3-bb45-1cc8998d98a2)
 
+![12](https://github.com/user-attachments/assets/348f8984-dc8c-47a5-9277-b3253da745b9)
 
 Enter Configuration:
 
