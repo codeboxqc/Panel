@@ -2,8 +2,8 @@
 #define FIRSTBOOT_H
 
 #include <Arduino.h>
-#include <WiFi.h>
-#include <WiFiClientSecure.h>
+//#include <WiFi.h>
+// #include <WiFiClientSecure.h>
 #include <WebServer.h>
 #include <Preferences.h>
 #include <ESP32-HUB75-MatrixPanel-I2S-DMA.h>

@@ -18,11 +18,15 @@
 void time(int x,int y);
 void inittime();
 
-extern unsigned char x64 [2048];
+ 
 extern MatrixPanel_I2S_DMA *dma_display;
  extern  uint16_t palette256[256];
 extern  uint16_t palette[16];
 
+
+extern  void initAsteroids();
+extern void asteroid();
+bool checkFirstBoot();
 
 /////////////////////////////////////////
 // Struct definition fire
@@ -65,7 +69,7 @@ void updateFlame(Flame* f);
 void drawFlame(Flame* f);
 /////////////////////////////////////////////////////////////////
 
-bool loadImage(const char* path, uint8_t* buffer, size_t bufSize) ;
+void draw3DLineAnimations(unsigned long time) ;
 
 /////////////////////////////////////////////////////////////////
 // Additional parameters for enhanced effect
@@ -87,7 +91,7 @@ typedef struct {
  
  ///////////////////////////////////
  //Modern Particle Wave Animation
-#define NUM_PARTICLES 7
+#define NUM_PARTICLES 9
   
 typedef struct {
   float x, y;
@@ -162,6 +166,23 @@ void RaymarchGlow(float t);
 void TronMatrixPulse(float t);
 void GooGlow(float t) ;
  
- 
+ extern unsigned char i1[2048] ;
+extern unsigned char i2[2048] ;
+extern unsigned char i3[2048] ;
+extern unsigned char i4[2048] ;
+extern unsigned char i5[2048] ;
+extern unsigned char i6[2048] ;
+extern unsigned char i7[2048] ;
+extern unsigned char i8[2048] ;
+extern unsigned char i9[2048] ;
+extern unsigned char i10[2048] ;
+extern unsigned char i11[2048] ;
+extern unsigned char i12[2048] ;
+extern unsigned char i13[2048] ;
+extern unsigned char i14[2048] ;
+extern unsigned char i15[2048] ;
 
+
+  
+ 
 #endif

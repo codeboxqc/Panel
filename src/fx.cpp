@@ -7,11 +7,8 @@
 #include "gfx.h"
 
 
-
-
-
-
-
+ 
+ 
 
 
 void plasmaAnimation(unsigned long time) {
@@ -315,14 +312,14 @@ void  Rain (unsigned long time) { //ok
 
 
 
-
+ 
 void initFlame(Flame* f) {
     f->width = WIDTH;
     f->height = HEIGHT;
-    f->buffer = PROGMEM(uint8_t*)malloc(WIDTH * HEIGHT);
-    f->fire_buffer = PROGMEM(uint8_t*)malloc(WIDTH * HEIGHT);
-    memset(f->buffer, 0, WIDTH * HEIGHT);
-    memset(f->fire_buffer, 0, WIDTH * HEIGHT);
+    f->buffer = (uint8_t*)malloc(f->width * f->height);
+    f->fire_buffer = (uint8_t*)malloc(f->width * f->height);
+    memset(f->buffer, 0, f->width * f->height);
+    memset(f->fire_buffer, 0, f->width * f->height);
 }
 
 void updateFlame(Flame* f) {
@@ -380,10 +377,10 @@ void drawFlame(Flame* f) { //ok
 // ====================================================
 
 void initPlasma(Plasma* plasma) {
-    plasma->width  = 256;
-    plasma->height = 256;
-    plasma->body   = (uint8_t*)malloc(256 * 256);
-    memset(plasma->body, 0, 256 * 256);
+    plasma->width  = WIDTH;
+    plasma->height = HEIGHT;
+    plasma->body   = (uint8_t*)malloc(WIDTH * HEIGHT);
+    memset(plasma->body, 0, WIDTH * HEIGHT);
 
     for (int i = 0; i < 256; i++) {
         plasma->cosinus[i] = (int)(30 * cos(i * (PI / 128)));
@@ -545,14 +542,14 @@ void starfieldEffect(unsigned long time) { //ok
 }
 
 
-
+ 
 
 
 
 // ====================================================
 // MatrixRain
 // ====================================================
-
+ 
 void initMatrixRain(MatrixRain* rain) {
   for (int i = 0; i < WIDTH; i++) {
     rain->speed[i] = 5 + random(20);        // Random speed
@@ -644,7 +641,7 @@ void drawMatrixRain(MatrixRain* rain) { //ok
 // ====================================================
 // Modern Particle Wave Animation
 // ====================================================
-
+ 
 Particle particles[NUM_PARTICLES];
 float time_counter = 0;
 uint8_t color_mode = 0;
@@ -791,7 +788,7 @@ void drawParticleSystem() { //ok
 void nextColorMode() {
   color_mode = (color_mode + 1) % 4;
 }
-
+ 
 
 
 
@@ -1881,6 +1878,14 @@ void plasmaEffect(unsigned long time) { //ok
             uint8_t col = (uint8_t)((val + 3.0f) / 6.0f * 15.0f) + 1;
              
             dma_display->drawPixel(x, y, fastHSVtoRGB((float)col / 16.0f, 1.0f, 1.0f));
+
+            
         }
     }
 }
+
+
+
+
+ 
+  

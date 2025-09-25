@@ -8,11 +8,10 @@
 // -------------------- Config --------------------
 const char* ntpServer = "pool.ntp.org";
 const char* timezone  = "EST5EDT,M3.2.0,M11.1.0"; // New York time
-char ssid[64];
-char password[64];
+ char  ssid[64]      = "user";
+ char  password[64]  = "password";
 
- String ssidGlob  ;
- String  passwordGlob  ;
+ 
 
  
 
@@ -127,8 +126,8 @@ char password[64];
 };
 
 
-  
 
+  
 
  
 
@@ -138,13 +137,6 @@ bool connectWiFi() {
 
 
  
- strncpy(ssid, ssidGlob.c_str(), sizeof(ssid));
- ssid[sizeof(ssid)-1] = '\0';   
-
-strncpy(password, passwordGlob.c_str(), sizeof(password));
-password[sizeof(password)-1] = '\0';
-
-  
    
 
   WiFi.begin(ssid, password);
@@ -301,7 +293,6 @@ void inittime() {
 void time(int x,int y) {   // your external loop
   
   
-   
 
   showtime(x,y,0x07E0);
   
