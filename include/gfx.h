@@ -8,6 +8,23 @@
 // ====================================================
 // HUB75 Panel Configuration
 // ====================================================
+#define R1_PIN 17
+#define B1_PIN 8
+#define R2_PIN 3
+#define B2_PIN 10
+#define A_PIN 15
+#define C_PIN 7
+#define CLK_PIN 5
+#define OE_PIN 12
+#define G1_PIN 18
+#define G2_PIN 2
+#define E_PIN 13
+#define B_PIN 11
+#define D_PIN 4
+#define LAT_PIN 6
+
+
+
  
 #define PANEL_CHAIN 1       // How many panels chained
 

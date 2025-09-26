@@ -7,32 +7,33 @@
 #include <WebServer.h>
 #include <Preferences.h>
 #include <ESP32-HUB75-MatrixPanel-I2S-DMA.h>
-
+#include "gfx.h"
 // Panel configuration
  
  
-
+ 
+ 
 // Configuration des pins par défaut pour la matrice LED HUB75
 struct MatrixPins {
-    int8_t R1_PIN = 17;
-    int8_t G1_PIN = 18;
-    int8_t B1_PIN = 8;
-    int8_t R2_PIN = 3;
-    int8_t G2_PIN = 2;
-    int8_t B2_PIN = 10;
-    int8_t A_PIN = 15;
-    int8_t B_PIN = 11;
-    int8_t C_PIN = 7;
-    int8_t D_PIN = 4;
-    int8_t E_PIN = 13;
-    int8_t LAT_PIN = 6;
-    int8_t OE_PIN = 12;
-    int8_t CLK_PIN = 5;
+    int8_t mR1_PIN = R1_PIN;
+    int8_t mG1_PIN = G1_PIN;
+    int8_t mB1_PIN = B1_PIN;
+    int8_t mR2_PIN = R2_PIN;
+    int8_t mG2_PIN = G2_PIN;
+    int8_t mB2_PIN = B2_PIN;
+    int8_t mA_PIN =  A_PIN;
+    int8_t mB_PIN = B_PIN;
+    int8_t mC_PIN = C_PIN;
+    int8_t mD_PIN = D_PIN;
+    int8_t mE_PIN = E_PIN;
+    int8_t mLAT_PIN = LAT_PIN;
+    int8_t mOE_PIN = OE_PIN;
+    int8_t mCLK_PIN = CLK_PIN;
     
     // Function to create HUB75 configuration
     HUB75_I2S_CFG::i2s_pins getPinsConfig() {
-        return {R1_PIN, G1_PIN, B1_PIN, R2_PIN, G2_PIN, B2_PIN,
-               A_PIN, B_PIN, C_PIN, D_PIN, E_PIN, LAT_PIN, OE_PIN, CLK_PIN};
+        return {mR1_PIN, mG1_PIN, mB1_PIN, mR2_PIN, mG2_PIN, mB2_PIN,
+               mA_PIN, mB_PIN, mC_PIN, mD_PIN, mE_PIN, mLAT_PIN, mOE_PIN, mCLK_PIN};
     }
 };
 

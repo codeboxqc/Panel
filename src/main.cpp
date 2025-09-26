@@ -9,27 +9,14 @@
 
 // Pin configuration - adjust these for your ESP32 setup
  
-#define R1_PIN 17
-#define B1_PIN 8
-#define R2_PIN 3
-#define B2_PIN 10
-#define A_PIN 15
-#define C_PIN 7
-#define CLK_PIN 5
-#define OE_PIN 12
-#define G1_PIN 18
-#define G2_PIN 2
-#define E_PIN 13
-#define B_PIN 11
-#define D_PIN 4
-#define LAT_PIN 6
+
  
 
 MatrixPanel_I2S_DMA *dma_display= nullptr; 
 
  
  
-Flame flame ;
+Flame flame ;  
 Plasma plasma ;
 MatrixRain matrix ;
  
@@ -237,7 +224,7 @@ void setup() {
 // ====================================================
 unsigned long stateStartTime = 0;
 const unsigned long showTimeDuration = 2UL * 60UL * 1000UL;  // 2 minutes
-const unsigned long animInterval = 1UL * 60UL * 1000UL;    //  15 minutes
+const unsigned long animInterval = 5UL * 60UL * 1000UL;    //  15 minutes
 const unsigned long hourInterval = 58UL * 60UL * 1000UL;     // 60 minutes
 ////////////////////////////////////////////////////////////////////////
 
@@ -245,7 +232,7 @@ const unsigned long hourInterval = 58UL * 60UL * 1000UL;     // 60 minutes
 
 
 unsigned long st =0;
-uint8_t currentAnimation =  0;
+uint8_t currentAnimation =  22;
 bool showTime = false;  // Tracks whether to show time or animation
 bool hasShownThisHour = false;  // Flag to prevent showing multiple times per hour
 
@@ -266,7 +253,7 @@ void loop() {
         if (now - stateStartTime >= 60UL * 60UL * 1000UL) { // 60 minutes
             showTime = true;
             stateStartTime = now;
-            currentAnimation =  random(0, 24);
+            currentAnimation ++;  if(currentAnimation>=23) currentAnimation=0;
             hasShownThisHour = false;
         }
     } else {
@@ -274,7 +261,8 @@ void loop() {
         if (timeinfo.tm_min == 59 && !hasShownThisHour) {
             showTime = true;
             stateStartTime = now;
-            currentAnimation =  random(0, 24);  // Pick animation for after time display
+            currentAnimation ++;  if(currentAnimation>=23) currentAnimation=0;
+
             hasShownThisHour = true;
         }
         
@@ -292,7 +280,7 @@ void loop() {
     
     // Check if it's time to change animation (every 3 minutes, only when not showing time)
     if (!showTime && now - stateStartTime >= animInterval) {
-        currentAnimation =  random(0, 24);  // Pick a new animation
+        currentAnimation ++;  if(currentAnimation>=23) currentAnimation=0;
         stateStartTime = now;  // Reset state start time
         
        
@@ -324,7 +312,7 @@ void loop() {
             case 1:
                  updateParticleSystem();
                  drawParticleSystem();
-                delay(11);
+                delay(33);
                 break;
 
             case 2:

@@ -3,7 +3,7 @@
 #include "firstboot.h"
 #include "html.h"
 
-
+ 
 
 
 // Global variables
@@ -39,46 +39,59 @@ void saveWiFiConfig(const char* ssid, const char* password) {
 // Save pin configuration
 void savePinConfig(MatrixPins& pins) {
     prefs.begin("esp32_config", false);
-    prefs.putInt("r1_pin", pins.R1_PIN);
-    prefs.putInt("b1_pin", pins.B1_PIN);
-    prefs.putInt("r2_pin", pins.R2_PIN);
-    prefs.putInt("b2_pin", pins.B2_PIN);
-    prefs.putInt("a_pin", pins.A_PIN);
-    prefs.putInt("c_pin", pins.C_PIN);
-    prefs.putInt("clk_pin", pins.CLK_PIN);
-    prefs.putInt("oe_pin", pins.OE_PIN);
-    prefs.putInt("g1_pin", pins.G1_PIN);
-    prefs.putInt("g2_pin", pins.G2_PIN);
-    prefs.putInt("e_pin", pins.E_PIN);
-    prefs.putInt("b_pin", pins.B_PIN);
-    prefs.putInt("d_pin", pins.D_PIN);
-    prefs.putInt("lat_pin", pins.LAT_PIN);
+    prefs.putInt("r1_pin", pins.mR1_PIN);
+    prefs.putInt("b1_pin", pins.mB1_PIN);
+    prefs.putInt("r2_pin", pins.mR2_PIN);
+    prefs.putInt("b2_pin", pins.mB2_PIN);
+    prefs.putInt("a_pin", pins.mA_PIN);
+    prefs.putInt("c_pin", pins.mC_PIN);
+    prefs.putInt("clk_pin", pins.mCLK_PIN);
+    prefs.putInt("oe_pin", pins.mOE_PIN);
+    prefs.putInt("g1_pin", pins.mG1_PIN);
+    prefs.putInt("g2_pin", pins.mG2_PIN);
+    prefs.putInt("e_pin", pins.mE_PIN);
+    prefs.putInt("b_pin", pins.mB_PIN);
+    prefs.putInt("d_pin", pins.mD_PIN);
+    prefs.putInt("lat_pin", pins.mLAT_PIN);
     prefs.putBool("configured", true);
     prefs.end();
     //Serial.println("Pins configuration saved");
 }
 
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+
 // Load pin configuration
 MatrixPins loadPinConfig() {
     MatrixPins loadedPins;
     prefs.begin("esp32_config", true);
-    loadedPins.R1_PIN = prefs.getInt("r1_pin", 17);
-    loadedPins.B1_PIN = prefs.getInt("b1_pin", 8);
-    loadedPins.R2_PIN = prefs.getInt("r2_pin", 3);
-    loadedPins.B2_PIN = prefs.getInt("b2_pin", 10);
-    loadedPins.A_PIN = prefs.getInt("a_pin", 15);
-    loadedPins.C_PIN = prefs.getInt("c_pin", 7);
-    loadedPins.CLK_PIN = prefs.getInt("clk_pin", 5);
-    loadedPins.OE_PIN = prefs.getInt("oe_pin", 12);
-    loadedPins.G1_PIN = prefs.getInt("g1_pin", 18);
-    loadedPins.G2_PIN = prefs.getInt("g2_pin", 2);
-    loadedPins.E_PIN = prefs.getInt("e_pin", 13);
-    loadedPins.B_PIN = prefs.getInt("b_pin", 11);
-    loadedPins.D_PIN = prefs.getInt("d_pin", 4);
-    loadedPins.LAT_PIN = prefs.getInt("lat_pin", 6);
+    loadedPins.mR1_PIN = prefs.getInt("r1_pin", R1_PIN);
+    loadedPins.mB1_PIN = prefs.getInt("b1_pin", B1_PIN);
+    loadedPins.mR2_PIN = prefs.getInt("r2_pin", R2_PIN);
+    loadedPins.mB2_PIN = prefs.getInt("b2_pin", B2_PIN );
+    loadedPins.mA_PIN = prefs.getInt("a_pin", A_PIN);
+    loadedPins.mC_PIN = prefs.getInt("c_pin", C_PIN);
+    loadedPins.mCLK_PIN = prefs.getInt("clk_pin", CLK_PIN);
+    loadedPins.mOE_PIN = prefs.getInt("oe_pin",  OE_PIN);
+    loadedPins.mG1_PIN = prefs.getInt("g1_pin", G1_PIN);
+    loadedPins.mG2_PIN = prefs.getInt("g2_pin", G2_PIN);
+    loadedPins.mE_PIN = prefs.getInt("e_pin", E_PIN);
+    loadedPins.mB_PIN = prefs.getInt("b_pin", B_PIN);
+    loadedPins.mD_PIN = prefs.getInt("d_pin", D_PIN);
+    loadedPins.mLAT_PIN = prefs.getInt("lat_pin", LAT_PIN);
     prefs.end();
     return loadedPins;
 }
+
+  
+  
 
 // Load WiFi configuration
 void loadWiFiConfig(char* ssid, char* password) {
@@ -93,20 +106,20 @@ void loadWiFiConfig(char* ssid, char* password) {
 // Reset configuration
 void resetConfig() {
     prefs.begin("esp32_config", false);
-    prefs.putInt("r1_pin", pins.R1_PIN);
-    prefs.putInt("b1_pin", pins.B1_PIN);
-    prefs.putInt("r2_pin", pins.R2_PIN);
-    prefs.putInt("b2_pin", pins.B2_PIN);
-    prefs.putInt("a_pin", pins.A_PIN);
-    prefs.putInt("c_pin", pins.C_PIN);
-    prefs.putInt("clk_pin", pins.CLK_PIN);
-    prefs.putInt("oe_pin", pins.OE_PIN);
-    prefs.putInt("g1_pin", pins.G1_PIN);
-    prefs.putInt("g2_pin", pins.G2_PIN);
-    prefs.putInt("e_pin", pins.E_PIN);
-    prefs.putInt("b_pin", pins.B_PIN);
-    prefs.putInt("d_pin", pins.D_PIN);
-    prefs.putInt("lat_pin", pins.LAT_PIN);
+    prefs.putInt("r1_pin", pins.mR1_PIN);
+    prefs.putInt("b1_pin", pins.mB1_PIN);
+    prefs.putInt("r2_pin", pins.mR2_PIN);
+    prefs.putInt("b2_pin", pins.mB2_PIN);
+    prefs.putInt("a_pin", pins.mA_PIN);
+    prefs.putInt("c_pin", pins.mC_PIN);
+    prefs.putInt("clk_pin", pins.mCLK_PIN);
+    prefs.putInt("oe_pin", pins.mOE_PIN);
+    prefs.putInt("g1_pin", pins.mG1_PIN);
+    prefs.putInt("g2_pin", pins.mG2_PIN);
+    prefs.putInt("e_pin", pins.mE_PIN);
+    prefs.putInt("b_pin", pins.mB_PIN);
+    prefs.putInt("d_pin", pins.mD_PIN);
+    prefs.putInt("lat_pin", pins.mLAT_PIN);
     prefs.putBool("configured", false);
     prefs.end();
     //Serial.println("Pins configuration saved");
@@ -156,46 +169,46 @@ void handleSave() {
         }
         
         int r1_val = extractPinValue(body, "r1_pin");
-        if (r1_val != -1) pins.R1_PIN = r1_val;
+        if (r1_val != -1) pins.mR1_PIN = r1_val;
         
         int g1_val = extractPinValue(body, "g1_pin");
-        if (g1_val != -1) pins.G1_PIN = g1_val;
+        if (g1_val != -1) pins.mG1_PIN = g1_val;
         
         int b1_val = extractPinValue(body, "b1_pin");
-        if (b1_val != -1) pins.B1_PIN = b1_val;
+        if (b1_val != -1) pins.mB1_PIN = b1_val;
         
         int r2_val = extractPinValue(body, "r2_pin");
-        if (r2_val != -1) pins.R2_PIN = r2_val;
+        if (r2_val != -1) pins.mR2_PIN = r2_val;
         
         int g2_val = extractPinValue(body, "g2_pin");
-        if (g2_val != -1) pins.G2_PIN = g2_val;
+        if (g2_val != -1) pins.mG2_PIN = g2_val;
         
         int b2_val = extractPinValue(body, "b2_pin");
-        if (b2_val != -1) pins.B2_PIN = b2_val;
+        if (b2_val != -1) pins.mB2_PIN = b2_val;
         
         int a_val = extractPinValue(body, "a_pin");
-        if (a_val != -1) pins.A_PIN = a_val;
+        if (a_val != -1) pins.mA_PIN = a_val;
         
         int b_val = extractPinValue(body, "b_pin");
-        if (b_val != -1) pins.B_PIN = b_val;
+        if (b_val != -1) pins.mB_PIN = b_val;
         
         int c_val = extractPinValue(body, "c_pin");
-        if (c_val != -1) pins.C_PIN = c_val;
+        if (c_val != -1) pins.mC_PIN = c_val;
         
         int d_val = extractPinValue(body, "d_pin");
-        if (d_val != -1) pins.D_PIN = d_val;
+        if (d_val != -1) pins.mD_PIN = d_val;
         
         int e_val = extractPinValue(body, "e_pin");
-        if (e_val != -1) pins.E_PIN = e_val;
+        if (e_val != -1) pins.mE_PIN = e_val;
         
         int lat_val = extractPinValue(body, "lat_pin");
-        if (lat_val != -1) pins.LAT_PIN = lat_val;
+        if (lat_val != -1) pins.mLAT_PIN = lat_val;
         
         int oe_val = extractPinValue(body, "oe_pin");
-        if (oe_val != -1) pins.OE_PIN = oe_val;
+        if (oe_val != -1) pins.mOE_PIN = oe_val;
         
         int clk_val = extractPinValue(body, "clk_pin");
-        if (clk_val != -1) pins.CLK_PIN = clk_val;
+        if (clk_val != -1) pins.mCLK_PIN = clk_val;
         
         if (strlen(tempSsid) > 0) {
             strlcpy(ssid, tempSsid, 64);
