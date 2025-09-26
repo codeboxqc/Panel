@@ -182,6 +182,10 @@ void RadialGlow(uint32_t time);
 void RaymarchGlow(float t);
 void TronMatrixPulse(float t);
 void GooGlow(float t) ;
+
+
+void initLetters();
+void matrixRain();
  
  extern unsigned char i1[2048] ;
 extern unsigned char i2[2048] ;

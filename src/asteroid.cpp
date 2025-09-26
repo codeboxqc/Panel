@@ -41,7 +41,6 @@ const float BOUNCE_DAMPING = 0.8f;
 const float MIN_VELOCITY = 0.2f;
 const float MAX_VELOCITY = 2.0f;
 const float COLLISION_DISTANCE = 7.0f;
-
  
  
 void updateAsteroids();
@@ -162,10 +161,10 @@ void checkCollisions() {
         }
         
         // Explosion après 3 collisions
-        if (asteroids[i].collisions >= 3) {
+        if (asteroids[i].collisions >= 5) {
           explodeAsteroid(i);
         }
-        if (asteroids[j].collisions >= 3) {
+        if (asteroids[j].collisions >= 5) {
           explodeAsteroid(j);
         }
       }
@@ -213,29 +212,29 @@ void respawnAsteroid(int index) {
   asteroids[index].vy = random(-200, 200) / 100.0f;
   asteroids[index].collisions = 0;
   asteroids[index].rotation = 0;
-  asteroids[index].size = random(3, 8);
+  asteroids[index].size = random(2, 5);
 }
 
 void updateAsteroids() {
   for (int i = 0; i < MAX_ASTEROIDS; i++) {
     if (!asteroids[i].active) continue;
-    
-    // Appliquer la gravité (attraction mutuelle simplifiée)
+
+    // Attraction/gravity code stays the same
     for (int j = 0; j < MAX_ASTEROIDS; j++) {
       if (i == j || !asteroids[j].active) continue;
-      
+
       float dx = asteroids[j].x - asteroids[i].x;
       float dy = asteroids[j].y - asteroids[i].y;
       float dist = sqrt(dx * dx + dy * dy);
-      
-      if (dist > 0 && dist < 30) { // Effet de gravité à courte distance
+
+      if (dist > 0 && dist < 30) {
         float force = GRAVITY / (dist * dist);
         asteroids[i].vx += (dx / dist) * force;
         asteroids[i].vy += (dy / dist) * force;
       }
     }
-    
-    // Limiter la vélocité
+
+    // Clamp speed
     float speed = sqrt(asteroids[i].vx * asteroids[i].vx + asteroids[i].vy * asteroids[i].vy);
     if (speed > MAX_VELOCITY) {
       asteroids[i].vx = (asteroids[i].vx / speed) * MAX_VELOCITY;
@@ -244,26 +243,20 @@ void updateAsteroids() {
       asteroids[i].vx = (asteroids[i].vx / speed) * MIN_VELOCITY;
       asteroids[i].vy = (asteroids[i].vy / speed) * MIN_VELOCITY;
     }
-    
-    // Mettre à jour la position
+
+    // Update position
     asteroids[i].x += asteroids[i].vx;
     asteroids[i].y += asteroids[i].vy;
     asteroids[i].rotation += asteroids[i].rotSpeed;
-    
-    // Rebonds sur les bords avec effet aléatoire
-    if (asteroids[i].x <= asteroids[i].size || asteroids[i].x >= WIDTH - asteroids[i].size) {
-      asteroids[i].vx = -asteroids[i].vx * BOUNCE_DAMPING;
-      asteroids[i].vx += random(-50, 50) / 100.0f; // Aléatoire
-      asteroids[i].x = constrain(asteroids[i].x, asteroids[i].size, WIDTH - asteroids[i].size);
-    }
-    
-    if (asteroids[i].y <= asteroids[i].size || asteroids[i].y >= HEIGHT - asteroids[i].size) {
-      asteroids[i].vy = -asteroids[i].vy * BOUNCE_DAMPING;
-      asteroids[i].vy += random(-50, 50) / 100.0f; // Aléatoire
-      asteroids[i].y = constrain(asteroids[i].y, asteroids[i].size, HEIGHT - asteroids[i].size);
-    }
+
+    // Wrap-around instead of bounce
+    if (asteroids[i].x < 0) asteroids[i].x = WIDTH - 1;
+    if (asteroids[i].x >= WIDTH) asteroids[i].x = 0;
+    if (asteroids[i].y < 0) asteroids[i].y = HEIGHT - 1;
+    if (asteroids[i].y >= HEIGHT) asteroids[i].y = 0;
   }
 }
+
 
 void updateDebris() {
   for (int i = 0; i < MAX_DEBRIS; i++) {

@@ -9,7 +9,7 @@
 
 // Pin configuration - adjust these for your ESP32 setup
  
-
+#define ANX 22+1
  
 
 MatrixPanel_I2S_DMA *dma_display= nullptr; 
@@ -25,7 +25,7 @@ MatrixRain matrix ;
 float fade = 1.0f; // Start fully visible
  
  
-void bubble(int q);
+void bubble();
 void pacman();
 
  
@@ -185,6 +185,8 @@ void setup() {
   dma_display->println(" http://19 2.168.4.1 ");
   dma_display->println("  Button  ");
   dma_display->println(" 2x reset ");
+
+  
   }
   delay(1000);
 }
@@ -199,7 +201,7 @@ void setup() {
 
   
  
- bubble(0);
+ bubble();
   
  
  inittime();
@@ -209,22 +211,19 @@ void setup() {
  initMatrixRain(&matrix);
  initParticleSystem();
  initAsteroids();
-
+ 
 }
  
  
 
-
-
  
-
 
 // ====================================================
 // Loop  
 // ====================================================
 unsigned long stateStartTime = 0;
 const unsigned long showTimeDuration = 2UL * 60UL * 1000UL;  // 2 minutes
-const unsigned long animInterval = 5UL * 60UL * 1000UL;    //  15 minutes
+const unsigned long animInterval = 3UL * 60UL * 1000UL;    //  15 minutes
 const unsigned long hourInterval = 58UL * 60UL * 1000UL;     // 60 minutes
 ////////////////////////////////////////////////////////////////////////
 
@@ -232,7 +231,7 @@ const unsigned long hourInterval = 58UL * 60UL * 1000UL;     // 60 minutes
 
 
 unsigned long st =0;
-uint8_t currentAnimation =  22;
+uint8_t currentAnimation =  random(0,ANX);
 bool showTime = false;  // Tracks whether to show time or animation
 bool hasShownThisHour = false;  // Flag to prevent showing multiple times per hour
 
@@ -253,7 +252,7 @@ void loop() {
         if (now - stateStartTime >= 60UL * 60UL * 1000UL) { // 60 minutes
             showTime = true;
             stateStartTime = now;
-            currentAnimation ++;  if(currentAnimation>=23) currentAnimation=0;
+            currentAnimation ++;  if(currentAnimation>=ANX) currentAnimation=0;
             hasShownThisHour = false;
         }
     } else {
@@ -261,7 +260,7 @@ void loop() {
         if (timeinfo.tm_min == 59 && !hasShownThisHour) {
             showTime = true;
             stateStartTime = now;
-            currentAnimation ++;  if(currentAnimation>=23) currentAnimation=0;
+            currentAnimation ++;  if(currentAnimation>=ANX) currentAnimation=0;
 
             hasShownThisHour = true;
         }
@@ -280,11 +279,11 @@ void loop() {
     
     // Check if it's time to change animation (every 3 minutes, only when not showing time)
     if (!showTime && now - stateStartTime >= animInterval) {
-        currentAnimation ++;  if(currentAnimation>=23) currentAnimation=0;
+        currentAnimation ++;  if(currentAnimation>=ANX) currentAnimation=0;
         stateStartTime = now;  // Reset state start time
         
        
-        bubble(random(0, 3));
+        bubble();
         
         fade = 1.0f;
          Jets = 0.0f;
@@ -434,6 +433,10 @@ void loop() {
                       asteroid();
                   break; 
 
+                  case 23:
+                       
+                  break; 
+
             default:
                 // Fallback in case of invalid animation index
                 time(1, 18);  // Draw current time
@@ -449,12 +452,14 @@ void loop() {
 
 
  
-void bubble(int q) {
+void bubble() {
 
     unsigned char *images[] PROGMEM= {  i1, i2, i3, i4, i5, i6, i7, i8, i9, i10, i11, i12, i13, i14, i15 };
 
-    int bob = random(0, 16);  // Random index  image.cpp
+    int bob = random(0, 14);  // Random index  image.cpp
     dma_display->clearScreen();
+
+    int q=0;
 
     if(q==0) putimage(0, 0, images[bob]);  // Display the selected image at (1, 1)
 
@@ -467,12 +472,10 @@ void bubble(int q) {
 
  
 
-    if(q!=1) delay(5000);
+    if(q!=1) delay(7000);
      
-    dma_display->clearScreen();
-
-
-   
+   // dma_display->clearScreen();
+ 
 }
 
 
@@ -484,12 +487,15 @@ void pacman() {
     unsigned char *images[] PROGMEM= {  i1, i2, i3, i4, i5, i6, i7, i8, i9, i10, i11, i12, i13, i14, i15 };
 
    
+
+    dma_display->clearScreen();
         
       for(int x=-10;x<100;x++) {
-        putimagesize(x, 20+random(0,3), images[bob], 32);
+        int ja=random(0,3);
+        putimagesize(x, 20+ja, images[bob], 32);
         delay(33);
  
-        dma_display->writeFillRect(x-1, 20 ,32,32,0x000);
+        dma_display->writeFillRect(x-1, 20+ja ,32,32,0x000);
        
     }
    
