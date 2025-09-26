@@ -52,7 +52,7 @@ Clone the Repository:
 
 Open VS Code.
 Go to the Terminal (View > Terminal or Ctrl+`).
-Run: git clone[ https://github.com/yourusername/your-repo-name.git](https://github.com/codeboxqc/Panel.git)  
+Run: git clone https://github.com/codeboxqc/Panel
 Open the cloned folder in VS Code (File > Open Folder).
 
 
