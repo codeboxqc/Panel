@@ -200,6 +200,10 @@ Pins: Adjust HUB75 pins if needed (defaults are pre-filled; ensure they match yo
 Click "Save Configuration".
 Page shows "Configuration saved! ESP32 will restart...".
 
+panel power 2 wire from brake out board seem enought no need power supply
+<img width="995" height="1361" alt="Untitled" src="https://github.com/user-attachments/assets/ec9b1ece-1dbf-46f8-9708-49bdd91a952a" />
+
+
 
 Verify and Restart:
 
