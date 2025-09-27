@@ -25,6 +25,16 @@ Graphics rendering with palettes and animations.
 The code uses the ESP32-HUB75-MatrixPanel-I2S-DMA library for efficient LED matrix control.
 Hardware Requirements
 
+/=======================================================
+installation driver for Windows
+
+![usb](https://github.com/user-attachments/assets/6631ec47-ffa5-4a82-94c9-211f618abba3)
+
+choose the right driver for your esp32
+https://www.wch-ic.com/downloads/CH343SER_EXE.html
+
+/===================================================
+
 ESP32 development board (e.g., ESP32-DevKitC or similar).
 HUB75-compatible LED matrix panel (tested with 64x64 panels).
 Jumper wires for connecting pins (default pins are defined in main.cpp).
@@ -47,6 +57,17 @@ Git (to clone the repository).
 
 Option 1: Build and Flash from VS Code (Using PlatformIO) - Step by Step for Beginners
 This method compiles the code and uploads it to the ESP32 directly from VS Code. No need for Arduino IDE.
+
+//===============================================================================================
+free install
+https://code.visualstudio.com/
+
+install add extension open prject compile!
+![2](https://github.com/user-attachments/assets/8b8c25ae-5596-4584-ba5b-18b1c3369680)
+
+![1](https://github.com/user-attachments/assets/a41f6644-f639-4021-9bed-0672b1eb5284)
+
+//================================================================================================
 
 Clone the Repository:
 
