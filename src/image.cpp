@@ -2,7 +2,7 @@
 
 #include <pgmspace.h> 
 #include "SPIFFS.h"
-#include <pgmspace.h> 
+
 // 64x64 image data, packed 4-bit (2 pixels per byte)
 // Compatible with ESP32 HUB75 Matrix Panel
  unsigned char i1[2048] PROGMEM= {

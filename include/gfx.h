@@ -183,9 +183,26 @@ void RaymarchGlow(float t);
 void TronMatrixPulse(float t);
 void GooGlow(float t) ;
 
+void textRenderingExample() ;
+void initTextBuffer();
+void clearTextBuffer();
+ void setBufferPixel(int x, int y, uint16_t color);
+ uint16_t getBufferPixel(int x, int y) ;
+void drawCharToBuffer(int x, int y, char c, uint16_t color);
+void drawTextToBuffer(int x, int y, const char *text, uint16_t color) ;
+ uint16_t rgb565(int r, int g, int b);
+void drawTextRGB(int x, int y, const char *text, int r, int g, int b);
+void pageFlip();
+void fillBufferRect(int x, int y, int w, int h, uint16_t color);
+ uint16_t fastRGB565(uint8_t r, uint8_t g, uint8_t b);
+uint16_t hsvToRgb(float h, float s, float v);
+ 
 
-void initLetters();
+float fastSin(float x) ;
+ void proverbe(  );
 void matrixRain();
+
+extern char buftext[256];
  
  extern unsigned char i1[2048] ;
 extern unsigned char i2[2048] ;

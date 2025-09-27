@@ -9,7 +9,7 @@
 
 // Pin configuration - adjust these for your ESP32 setup
  
-#define ANX 22+1
+#define ANX 25+1
  
 
 MatrixPanel_I2S_DMA *dma_display= nullptr; 
@@ -28,9 +28,8 @@ float fade = 1.0f; // Start fully visible
 void bubble();
 void pacman();
 
- 
 
-
+char buftext[256];
 
 
 uint16_t palette[16] PROGMEM= {
@@ -211,10 +210,17 @@ void setup() {
  initMatrixRain(&matrix);
  initParticleSystem();
  initAsteroids();
+ initTextBuffer();
+
+ 
+
+///dma_display->clearScreen();
+ 
+  //  textRenderingExample();
+   // delay(5000);
+proverbe( );
  
 }
- 
- 
 
  
 
@@ -291,7 +297,7 @@ void loop() {
 
 
 /////////////////////////////
- //      currentAnimation =22;  //test
+//     currentAnimation =5;  //test
 ///////////////////////////
 
 
@@ -317,13 +323,14 @@ void loop() {
             case 2:
                 GooGlow(Jets );
                  Jets += 0.03;
+                 pageFlip();
                 break;
 
             case 3:
                  updateMatrixRain(&matrix);
                 drawMatrixRain(&matrix);
                 delay(10);
-                dma_display->clearScreen();
+                //dma_display->clearScreen();
                 break;
 
             case 4: 
@@ -331,14 +338,17 @@ void loop() {
               TronMatrixPulse(Jets );
               Jets += 0.03;     
               delay(2);   
+               
                 
                 break;
                 
 
             case 5: //////////////////
-                   RaymarchGlow(Jets );
+                       RaymarchGlow(Jets );
                        Jets += 0.03;
+                       pageFlip();
                        delay(5);
+
                 break;
 
             case 6:
@@ -434,7 +444,9 @@ void loop() {
                   break; 
 
                   case 23:
-                       
+                  case 24:
+                  case 25:
+                       proverbe( );
                   break; 
 
             default:
