@@ -285,7 +285,7 @@ void loop() {
     
     // Check if it's time to change animation (every 3 minutes, only when not showing time)
     if (!showTime && now - stateStartTime >= animInterval) {
-        currentAnimation ++;  if(currentAnimation>=ANX) currentAnimation=0;
+        if(currentAnimation>=ANX) currentAnimation=0;
         stateStartTime = now;  // Reset state start time
         
        
@@ -297,7 +297,7 @@ void loop() {
 
 
 /////////////////////////////
-//     currentAnimation =5;  //test
+//    currentAnimation =25;  //test
 ///////////////////////////
 
 
