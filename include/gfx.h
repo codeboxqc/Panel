@@ -32,7 +32,7 @@
 #define HEIGHT 64
  
 
-void time(int x,int y);
+void timeE(int x,int y);
 void inittime();
 
  

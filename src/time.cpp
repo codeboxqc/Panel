@@ -152,12 +152,20 @@ bool connectWiFi() {
 // -------------------- Time Sync --------------------
 bool getTimeFromHTTP() {
   if (WiFi.status() != WL_CONNECTED) return false;
+  
   HTTPClient http;
+  bool success = false;
+
   http.begin("http://worldtimeapi.org/api/timezone/America/New_York");
   int httpCode = http.GET();
-  bool success = false;
+
+
   if (httpCode == 200) {
-    String payload = http.getString();
+    
+    String payload;
+    payload.reserve(512);
+    payload = http.getString();
+
     int idx = payload.indexOf("\"datetime\":\"");
     if (idx > 0) {
       String datetime = payload.substring(idx + 12, idx + 31);
@@ -198,6 +206,7 @@ bool syncTime() {
  
 void drawDigit(int digit, int x, int y, uint16_t color, uint16_t bg) {
     if (digit < 0 || digit > 9) return;
+    if (!dma_display) return;
 
     const unsigned char* digits[10] = { z0, z1, z2, z3, z4, z5, z6, z7, z8, z9 };
 
@@ -218,6 +227,9 @@ void drawDigit(int digit, int x, int y, uint16_t color, uint16_t bg) {
 
 
  void drawColon(int x, int y, bool on, uint16_t color, uint16_t bg) {
+
+  if (!dma_display) return;
+
   // 2 dots, 1 above 1 below
   if (on) {
     dma_display->drawPixel(x, y,     0xF800); //red
@@ -231,6 +243,8 @@ void drawDigit(int digit, int x, int y, uint16_t color, uint16_t bg) {
 // -------------------- Show time --------------------
 void showtime(int xx, int yy, uint16_t color) {
     struct tm timeinfo={};
+
+    if (!dma_display) return;
 
     memset(&timeinfo, 0, sizeof(timeinfo));
 
@@ -290,7 +304,7 @@ void inittime() {
    
 }
 
-void time(int x,int y) {   // your external loop
+void timeE(int x,int y) {   // your external loop
   
   
 

@@ -9,16 +9,17 @@
 
 // Pin configuration - adjust these for your ESP32 setup
  
-#define ANX 25+1
+#define ANX 23+1
  
 
 MatrixPanel_I2S_DMA *dma_display= nullptr; 
 
  
  
-Flame flame ;  
-Plasma plasma ;
-MatrixRain matrix ;
+Flame  flame  ;
+Plasma plasma  ;
+MatrixRain matrix  ;
+
  
  
 
@@ -29,7 +30,7 @@ void bubble();
 void pacman();
 
 
-char buftext[256];
+char buftext[256]={"\0"};
 
 
 uint16_t palette[16] PROGMEM= {
@@ -220,6 +221,7 @@ void setup() {
    // delay(5000);
 proverbe( );
  
+ 
 }
 
  
@@ -258,17 +260,19 @@ void loop() {
         if (now - stateStartTime >= 60UL * 60UL * 1000UL) { // 60 minutes
             showTime = true;
             stateStartTime = now;
-            currentAnimation ++;  if(currentAnimation>=ANX) currentAnimation=0;
+            currentAnimation = (currentAnimation + 1) % ANX; 
             hasShownThisHour = false;
+            proverbe( );
         }
     } else {
         // Check if it's a new hour (minutes are 0 and we haven't shown time this hour)
         if (timeinfo.tm_min == 59 && !hasShownThisHour) {
             showTime = true;
             stateStartTime = now;
-            currentAnimation ++;  if(currentAnimation>=ANX) currentAnimation=0;
+            currentAnimation = (currentAnimation + 1) % ANX; 
 
             hasShownThisHour = true;
+            proverbe( );
         }
         
         // Reset the flag when we're past minute 0
@@ -285,7 +289,7 @@ void loop() {
     
     // Check if it's time to change animation (every 3 minutes, only when not showing time)
     if (!showTime && now - stateStartTime >= animInterval) {
-        if(currentAnimation>=ANX) currentAnimation=0;
+        currentAnimation = (currentAnimation + 1) % ANX; 
         stateStartTime = now;  // Reset state start time
         
        
@@ -304,7 +308,7 @@ void loop() {
 
     // Execute the appropriate state
     if (showTime) {
-        time(1, 18);  // Draw current time
+        timeE(1, 18);  // Draw current time
         dma_display->clearScreen();
     } else {
         switch (currentAnimation) {
@@ -444,14 +448,18 @@ void loop() {
                   break; 
 
                   case 23:
+                   proverbe( );
+                  break; 
                   case 24:
+                  // proverbe( );
+                  break; 
                   case 25:
-                       proverbe( );
+                     //  proverbe( );
                   break; 
 
             default:
                 // Fallback in case of invalid animation index
-                time(1, 18);  // Draw current time
+                timeE(1, 18);  // Draw current time
                 dma_display->clearScreen();
                 break;
         }
