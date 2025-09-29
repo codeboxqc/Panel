@@ -359,8 +359,9 @@ void pageFlip() {
     char buftext[256] = "\0";
 
     
-    int r = random(0, 172); // Random value for selecting proverb (0-99)
+    int r = random(0, 180); // Random value for selecting proverb (0-99)
 
+    /*
     // Array of 100 tech/hacker/coder/retro game proverbs and quotes
    const char *proverbs[171] PROGMEM = {
         "Code is the key to the digital kingdom\0", 
@@ -534,20 +535,108 @@ void pageFlip() {
         "Debug with purpose\0", 
         "The pixel is mightier than the pen\0", 
         "Code is art, bugs are the canvas\0"
+    };*/
+
+    const char *proverbs[175] PROGMEM = {
+    "I'm not arguing, I'm just explaining why I'm right\0",
+    "To err is human, to blame it on someone else shows management potential\0",
+    "I used to think I was indecisive, but now I'm not too sure\0",
+    "Why do they call it rush hour when nothing moves?\0",
+    "I'm on a seafood diet. I see food and I eat it\0",
+    "If at first you don't succeed, skydiving is not for you\0",
+    "Life is short. Smile while you still have teeth\0",
+    "I told my computer I needed a break, and it said '404: Motivation not found'\0",
+    "Always borrow money from a pessimist. They won’t expect it back\0",
+    "Behind every successful person is a substantial amount of coffee\0",
+    "I'm great at multitasking. I can waste time, be unproductive, and procrastinate all at once\0",
+    "If you think nobody cares if you're alive, try missing a couple of car payments\0",
+    "My bed is a magical place where I suddenly remember everything I forgot to do\0",
+    "The early bird might get the worm, but the second mouse gets the cheese\0",
+    "I used to be a people person, but people ruined that for me\0",
+    "Why yes, I do frequently burst out in song. Thanks for noticing\0",
+    "I’m not lazy, I’m just on energy-saving mode\0",
+    "Common sense is like deodorant. The people who need it most never use it\0",
+    "I’m not weird, I’m limited edition\0",
+    "Some people graduate with honors, I am just honored to graduate\0",
+    "I put the ‘pro’ in procrastinate\0",
+    "I’m not short, I’m concentrated awesome\0",
+    "I tried to be normal once. Worst two minutes ever\0",
+    "If life gives you lemons, squirt someone in the eye\0",
+    "I don’t suffer from insanity—I enjoy every minute of it\0",
+    "I'm not lazy. I'm just highly motivated to do nothing\0",
+    "I thought I wanted a career, turns out I just wanted a paycheck\0",
+    "I clean when I’m angry. So if you see me cleaning, run\0",
+    "I’m not bossy, I just have better ideas\0",
+    "I’m not old, I’m 25 plus shipping and handling\0",
+    "I dance because there’s no guarantee the world won’t end tomorrow\0",
+    "I’m not clumsy. The floor just hates me, the table and chairs are bullies, and the walls get in my way\0",
+    "If you can’t convince them, confuse them\0",
+    "I’m not addicted to coffee, we’re just in a committed relationship\0",
+    "I used to play sports. Then I realized you can buy trophies. Now I’m good at everything\0",
+    "I’m not a complete idiot—some parts are missing\0",
+    "I’m not arguing, I’m just passionately expressing my point of view\0",
+    "I’m not sure how many problems I have because math is one of them\0",
+    "I’m not procrastinating. I’m proactively delaying the inevitable\0",
+    "I’m not ignoring you, I’m just giving you time to reflect on what you just said\0",
+    "I’m not late. I’m just early for tomorrow\0",
+    "I’m not overthinking. I’m just thinking more than you\0",
+    "The unexamined life is not worth living — Socrates\0",
+    "Do not try and bend the spoon. That’s impossible. Instead, only try to realize the truth — The Matrix\0",
+    "Imagination is more important than knowledge — Einstein\0",
+    "All we have to decide is what to do with the time that is given us — Tolkien\0",
+    "Reality is merely an illusion, albeit a very persistent one — Einstein\0",
+    "The needs of the many outweigh the needs of the few — Spock\0",
+    "I think, therefore I am — Descartes\0",
+    "The future is already here — it's just not evenly distributed — William Gibson\0",
+    "A person is smart. People are dumb, panicky, dangerous animals — Men in Black\0",
+    "The greatest enemy of knowledge is not ignorance, it is the illusion of knowledge — Stephen Hawking\0",
+    "Fear is the mind-killer — Dune\0",
+    "Not all those who wander are lost — Tolkien\0",
+    "Any sufficiently advanced technology is indistinguishable from magic — Arthur C. Clarke\0",
+    "We are all in the gutter, but some of us are looking at the stars — Oscar Wilde\0",
+    "Life finds a way — Jurassic Park\0",
+    "You must unlearn what you have learned — Yoda\0",
+    "The cosmos is within us. We are made of star-stuff — Carl Sagan\0",
+    "There is no spoon — The Matrix\0",
+    "The only way to deal with an unfree world is to become so absolutely free that your very existence is an act of rebellion — Camus\0",
+    "To boldly go where no one has gone before — Star Trek\0",
+    "In the middle of difficulty lies opportunity — Einstein\0",
+    "The only true wisdom is in knowing you know nothing — Socrates\0",
+    "You can’t stop the signal — Serenity\0",
+    "The truth is out there — X-Files\0",
+    "We are the music makers, and we are the dreamers of dreams — Arthur O’Shaughnessy\0",
+    "I have no special talents. I am only passionately curious — Einstein\0",
+    "The mind is everything. What you think you become — Buddha\0",
+    "The first principle is that you must not fool yourself—and you are the easiest person to fool — Richard Feynman\0",
+    "Time is an illusion. Lunchtime doubly so — Douglas Adams\0",
+    "You either die a hero or live long enough to see yourself become the villain — The Dark Knight\0",
+    "We are what we repeatedly do. Excellence, then, is not an act, but a habit — Aristotle\0",
+    "The only limit to our realization of tomorrow is our doubts of today — FDR\0",
+    "The universe is under no obligation to make sense to you — Neil deGrasse Tyson\0",
+    "All models are wrong, but some are useful — George Box\0",
+    "The best way to predict the future is to invent it — Alan Kay\0",
+    "You can’t take the sky from me — Firefly\0",
+    "There is grandeur in this view of life — Darwin\0",
+    "We are not thinking machines that feel; we are feeling machines that think — Antonio Damasio\0",
+    "The arc of the moral universe is long, but it bends toward justice — MLK Jr.\0",
+    "The greatest glory in living lies not in never falling, but in rising every time we fall — Mandela\0"
     };
+     
 
     // Copy selected proverb from PROGMEM to buftext
     strcpy_P(buftext, (const char *)pgm_read_ptr(&proverbs[r]));
 
     const int charWidth = 8; // 6 pixels + 2 spacing for readability
     const int baseY = 30; // Fixed y position
-    const int amplitude = 20; // Wave amplitude
+    const int amplitude = 13; // Wave amplitude
     const float frequency = 5.0f; // Wave frequency
     int startX = 50; // Start on right side
 
     // Create a lowercase copy of buftext
     char lowerText[256];
-    for (int i = 0; i < 256 && buftext[i] != '\0'; i++) {
+    for (int i = 0; i < 175 && buftext[i] != '\0'; i++) {
+        if(buftext[i]=='\'') buftext[i]=' ';
+        if(buftext[i]=='—') buftext[i]=' ';
         lowerText[i] = tolower(buftext[i]);
         lowerText[i+1]= '\0';
     }

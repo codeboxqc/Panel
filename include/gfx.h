@@ -40,6 +40,8 @@ extern MatrixPanel_I2S_DMA *dma_display;
  extern  uint16_t palette256[256];
 extern  uint16_t palette[16];
 
+extern void initSupercharged();
+extern void updateSupercharged();
 
 extern  void initAsteroids();
 extern void asteroid();

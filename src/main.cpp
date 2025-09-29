@@ -9,7 +9,7 @@
 
 // Pin configuration - adjust these for your ESP32 setup
  
-#define ANX 23+1
+#define ANX 25+1
  
 
 MatrixPanel_I2S_DMA *dma_display= nullptr; 
@@ -212,7 +212,7 @@ void setup() {
  initParticleSystem();
  initAsteroids();
  initTextBuffer();
-
+initSupercharged();
  
 
 ///dma_display->clearScreen();
@@ -231,7 +231,7 @@ proverbe( );
 // ====================================================
 unsigned long stateStartTime = 0;
 const unsigned long showTimeDuration = 2UL * 60UL * 1000UL;  // 2 minutes
-const unsigned long animInterval = 3UL * 60UL * 1000UL;    //  15 minutes
+const unsigned long animInterval = 6UL * 60UL * 1000UL;    //  6 minutes
 const unsigned long hourInterval = 58UL * 60UL * 1000UL;     // 60 minutes
 ////////////////////////////////////////////////////////////////////////
 
@@ -262,7 +262,7 @@ void loop() {
             stateStartTime = now;
             currentAnimation = (currentAnimation + 1) % ANX; 
             hasShownThisHour = false;
-            proverbe( );
+             
         }
     } else {
         // Check if it's a new hour (minutes are 0 and we haven't shown time this hour)
@@ -272,7 +272,7 @@ void loop() {
             currentAnimation = (currentAnimation + 1) % ANX; 
 
             hasShownThisHour = true;
-            proverbe( );
+            
         }
         
         // Reset the flag when we're past minute 0
@@ -294,6 +294,7 @@ void loop() {
         
        
         bubble();
+       
         
         fade = 1.0f;
          Jets = 0.0f;
@@ -301,7 +302,7 @@ void loop() {
 
 
 /////////////////////////////
-//    currentAnimation =25;  //test
+//     currentAnimation =24;  //test
 ///////////////////////////
 
 
@@ -451,10 +452,10 @@ void loop() {
                    proverbe( );
                   break; 
                   case 24:
-                  // proverbe( );
+                  updateSupercharged();
                   break; 
                   case 25:
-                     //  proverbe( );
+                     proverbe( );
                   break; 
 
             default:
