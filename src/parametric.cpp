@@ -5,8 +5,7 @@
 #include "gfx.h"
 
 // Display dimensions - adjust for your LED matrix
-#define WIDTH 64
-#define HEIGHT 64
+
 #define CENTER_X (WIDTH/2)
 #define CENTER_Y (HEIGHT/2)
 

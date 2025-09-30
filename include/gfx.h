@@ -5,6 +5,10 @@
 
 
 
+#define PANEL_CHAIN 1       // How many panels chained
+
+#define WIDTH 64
+#define HEIGHT 64
 // ====================================================
 // HUB75 Panel Configuration
 // ====================================================
@@ -26,10 +30,7 @@
 
 
  
-#define PANEL_CHAIN 1       // How many panels chained
 
-#define WIDTH 64
-#define HEIGHT 64
  
 
 void timeE(int x,int y);
@@ -46,6 +47,7 @@ extern void updateSupercharged();
 extern  void initAsteroids();
 extern void asteroid();
 bool checkFirstBoot();
+void logo();
 
 /////////////////////////////////////////
 // Struct definition fire

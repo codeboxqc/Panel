@@ -200,8 +200,8 @@ void setup() {
   fbootPIN();
 
   
- 
- bubble();
+ logo();
+
   
  
  inittime();
@@ -215,10 +215,13 @@ void setup() {
 initSupercharged();
  
 
+
 ///dma_display->clearScreen();
  
   //  textRenderingExample();
-   // delay(5000);
+
+   bubble();
+    delay(5000);
 proverbe( );
  
  
@@ -231,7 +234,7 @@ proverbe( );
 // ====================================================
 unsigned long stateStartTime = 0;
 const unsigned long showTimeDuration = 2UL * 60UL * 1000UL;  // 2 minutes
-const unsigned long animInterval = 6UL * 60UL * 1000UL;    //  6 minutes
+const unsigned long animInterval = 7UL * 60UL * 1000UL;    //  6 minutes
 const unsigned long hourInterval = 58UL * 60UL * 1000UL;     // 60 minutes
 ////////////////////////////////////////////////////////////////////////
 
@@ -492,7 +495,7 @@ void bubble() {
                }
 
  
-
+     pageFlip();
     if(q!=1) delay(7000);
      
    // dma_display->clearScreen();
@@ -514,12 +517,13 @@ void pacman() {
       for(int x=-10;x<100;x++) {
         int ja=random(0,3);
         putimagesize(x, 20+ja, images[bob], 32);
+        pageFlip();
         delay(33);
  
-        dma_display->writeFillRect(x-1, 20+ja ,32,32,0x000);
+        //dma_display->writeFillRect(x-1, 20+ja ,32,32,0x000);
        
     }
-   
+    
 }
 
 
