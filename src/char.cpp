@@ -676,7 +676,7 @@ void pageFlip() {
         pageFlip();
         startX -= 1; // Move string left
         baz += 1.4f; // Smooth wave progression
-        delay(40); // Smooth scrolling (~30 FPS)
+        delay(30); // Smooth scrolling (~30 FPS)
     }
 }
 

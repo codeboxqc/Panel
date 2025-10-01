@@ -188,7 +188,7 @@ void setup() {
 
   
   }
-  delay(1000);
+  delay(100);
 }
 //*/
  
@@ -203,7 +203,7 @@ void setup() {
  logo();
 
   
- 
+ initTextBuffer();//init buffer first*************************
  inittime();
  initFlame(&flame);
  initPlasma(&plasma);
@@ -211,7 +211,6 @@ void setup() {
  initMatrixRain(&matrix);
  initParticleSystem();
  initAsteroids();
- initTextBuffer();
 initSupercharged();
  
 
@@ -220,9 +219,10 @@ initSupercharged();
  
   //  textRenderingExample();
 
-   bubble();
-    delay(5000);
-proverbe( );
+  // bubble();
+  //  delay(5000);
+
+if(random(0,3)==1) proverbe( );
  
  
 }
@@ -296,7 +296,7 @@ void loop() {
         stateStartTime = now;  // Reset state start time
         
        
-        bubble();
+       // bubble();
        
         
         fade = 1.0f;
@@ -305,7 +305,7 @@ void loop() {
 
 
 /////////////////////////////
-//     currentAnimation =24;  //test
+ //    currentAnimation =8;  //test
 ///////////////////////////
 
 
@@ -317,6 +317,7 @@ void loop() {
     } else {
         switch (currentAnimation) {
             case 0:
+             
                 updateFlame(&flame);
                 drawFlame(&flame);
                 delay(11);
@@ -331,7 +332,7 @@ void loop() {
             case 2:
                 GooGlow(Jets );
                  Jets += 0.03;
-                 pageFlip();
+                // pageFlip();
                 break;
 
             case 3:
@@ -354,7 +355,7 @@ void loop() {
             case 5: //////////////////
                        RaymarchGlow(Jets );
                        Jets += 0.03;
-                       pageFlip();
+                      
                        delay(5);
 
                 break;
@@ -443,7 +444,7 @@ void loop() {
                   
                  case 21:
                        
-                  // bubble(1);  
+                  
                     draw3DLineAnimations(millis() );
                   break;            
      
@@ -452,13 +453,14 @@ void loop() {
                   break; 
 
                   case 23:
-                   proverbe( );
+                   bubble();
                   break; 
                   case 24:
                   updateSupercharged();
                   break; 
                   case 25:
                      proverbe( );
+                     currentAnimation=0;
                   break; 
 
             default:
@@ -499,7 +501,7 @@ void bubble() {
     if(q!=1) delay(7000);
      
    // dma_display->clearScreen();
- 
+   currentAnimation = (currentAnimation + 1) % ANX; 
 }
 
 
@@ -523,6 +525,7 @@ void pacman() {
         //dma_display->writeFillRect(x-1, 20+ja ,32,32,0x000);
        
     }
+    currentAnimation = (currentAnimation + 1) % ANX; 
     
 }
 
