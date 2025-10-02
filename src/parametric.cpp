@@ -121,8 +121,9 @@ uint16_t getPlasmaColor(float x, float y, float time) {
 void calculateCurvePoint(float theta, float radius, int curveType, float *outX, float *outY) {
     float x = 0, y = 0;
     float tFactor = t * 0.8f;
+    float r=0.0f;
     
-    switch(curveType % 61) {
+    switch(curveType % 72) {
         case 0: // Rose curve
             x = radius * fastCos(3 * theta + t) * fastCos(theta);
             y = radius * fastSin(3 * theta + t) * fastSin(theta);
@@ -618,10 +619,120 @@ void calculateCurvePoint(float theta, float radius, int curveType, float *outX, 
                 y = r * fastSin(theta);
             }
             break;
+
+
+
+          case 61:  // Spiral with time-based expansion
+            r = radius * (0.7f + 0.3f * sin(t * 0.5f));
+            x = r * cos(theta) * (1.0f + 0.3f * sin(t + theta * 2.0f));
+            y = r * sin(theta) * (1.0f + 0.3f * cos(t + theta * 1.5f));
+            break;
             
-        default: // Default circle with modulation
-            x = radius * fastCos(theta + t) * (1 + 0.2f * fastSin(5 * theta));
-            y = radius * fastSin(theta + t) * (1 + 0.2f * fastCos(5 * theta));
+        case 62:  // Pulsating flower
+            r = radius * (0.6f + 0.4f * sin(t * 0.7f + theta));
+            x = r * cos(theta) * (1.0f + 0.5f * sin(theta * 5.0f + t * 2.0f));
+            y = r * sin(theta) * (1.0f + 0.5f * cos(theta * 5.0f + t * 2.0f));
+            break;
+            
+        case 63:  // Rotating star with breathing effect
+            r = radius * (0.5f + 0.5f * sin(t * 0.3f));
+            x = r * cos(theta * 3.0f) * cos(theta + t);
+            y = r * sin(theta * 3.0f) * sin(theta + t);
+            break;
+            
+        case 64:  // Lissajous with time variation
+            x = radius * sin(theta * 2.0f + t * 1.3f) * (0.8f + 0.2f * sin(t));
+            y = radius * sin(theta * 3.0f + t * 1.7f) * (0.8f + 0.2f * cos(t));
+            break;
+            
+        case 65:  // Worm-like undulation
+            x = radius * cos(theta) * (1.0f + 0.4f * sin(theta * 8.0f + t * 3.0f));
+            y = radius * sin(theta) * (1.0f + 0.4f * cos(theta * 8.0f + t * 3.0f));
+            break;
+            
+        case 66:  // Pulsating circles with offset
+            r = radius * (0.4f + 0.6f * sin(t * 0.8f + theta));
+            x = r * cos(theta + sin(t * 0.5f));
+            y = r * sin(theta + cos(t * 0.5f));
+            break;
+            
+        case 67:  // Hyperbolic spiral
+            r = radius / (theta + 1.0f) * (1.5f + sin(t));
+            x = r * cos(theta + t);
+            y = r * sin(theta + t);
+            break;
+            
+        case 68:  // Epicycloid
+            x = radius * (cos(theta) + 0.3f * cos(7.0f * theta + t * 2.0f));
+            y = radius * (sin(theta) + 0.3f * sin(7.0f * theta + t * 2.0f));
+            break;
+            
+        case 69:  // Heart curve with pulse
+            r = radius * (0.7f + 0.3f * sin(t));
+            x = r * 16.0f * pow(sin(theta), 3.0f);
+            y = r * -(13.0f * cos(theta) - 5.0f * cos(2.0f * theta) - 2.0f * cos(3.0f * theta) - cos(4.0f * theta));
+            x *= 0.03f; y *= 0.03f;  // Scale down
+            break;
+            
+        case 70:  // Butterfly curve
+            r = radius * exp(cos(theta)) - 2.0f * cos(4.0f * theta) + pow(sin(theta/12.0f), 5.0f);
+            x = r * cos(theta + t) * 0.2f;
+            y = r * sin(theta + t) * 0.2f;
+            break;
+            
+        case 71: // Rotating square morph
+            r = radius * (0.8f + 0.2f * sin(t * 2.0f));
+            x = r * (cos(theta) + 0.3f * cos(3.0f * theta + t));
+            y = r * (sin(theta) + 0.3f * sin(3.0f * theta + t));
+            break;
+            
+        case 72: // Breathing grid
+            x = radius * cos(theta) * (1.0f + 0.5f * sin(t * 2.0f + theta * 4.0f));
+            y = radius * sin(theta) * (1.0f + 0.5f * cos(t * 2.0f + theta * 4.0f));
+            break;
+            
+        case 73: // Twisting ribbon
+            x = radius * (0.7f + 0.3f * cos(t)) * cos(theta + sin(t * 1.5f));
+            y = radius * (0.7f + 0.3f * sin(t)) * sin(theta + cos(t * 1.5f));
+            break;
+            
+        case 74: // Pulsating waves
+            x = radius * cos(theta) * (0.8f + 0.4f * sin(theta * 6.0f + t * 3.0f));
+            y = radius * sin(theta) * (0.8f + 0.4f * cos(theta * 6.0f + t * 3.0f));
+            break;
+            
+        case 75: // Morphing blob
+            r = radius * (0.6f + 0.4f * sin(theta * 5.0f + t * 2.0f));
+            x = r * cos(theta + t * 0.7f);
+            y = r * sin(theta + t * 0.7f);
+            break;
+            
+        case 76: // Double helix
+            x = radius * cos(theta) + radius * 0.3f * cos(3.0f * theta + t);
+            y = radius * sin(theta) + radius * 0.3f * sin(3.0f * theta + t);
+            break;
+            
+        case 77: // Chaotic attractor-like
+            x = radius * sin(theta * 0.7f + t) * cos(theta * 1.3f);
+            y = radius * cos(theta * 0.7f + t) * sin(theta * 1.3f);
+            break;
+            
+        case 78: // Pulsating rings
+            r = radius * (0.5f + 0.5f * sin(t + theta * 2.0f));
+            x = r * cos(theta * 2.0f);
+            y = r * sin(theta * 2.0f);
+            break;
+            
+        case 79: // Swirling vortex
+            r = radius * (0.3f + 0.7f * (theta / TWO_PI));
+            x = r * cos(theta * 2.0f + t * 2.0f);
+            y = r * sin(theta * 2.0f + t * 2.0f);
+            break;
+            
+        default:
+            r = radius * (0.6f + 0.4f * sin(t * 0.9f + theta * 1.7f));
+            x = r * cos(theta) * (1.0f + 0.3f * sin(t * 1.2f + theta * 3.0f));
+            y = r * sin(theta) * (1.0f + 0.3f * cos(t * 1.2f + theta * 3.0f));
             break;
     }
     

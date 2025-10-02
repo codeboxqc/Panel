@@ -204,6 +204,8 @@ void setup() {
 
   
  initTextBuffer();//init buffer first*************************
+ clearTextBuffer();
+
  inittime();
  initFlame(&flame);
  initPlasma(&plasma);
@@ -211,7 +213,7 @@ void setup() {
  initMatrixRain(&matrix);
  initParticleSystem();
  initAsteroids();
-initSupercharged();
+ initSupercharged();
  
 
 
@@ -222,7 +224,7 @@ initSupercharged();
   // bubble();
   //  delay(5000);
 
-if(random(0,3)==1) proverbe( );
+if(random(0,4)==1) proverbe( );
  
  
 }
@@ -242,7 +244,7 @@ const unsigned long hourInterval = 58UL * 60UL * 1000UL;     // 60 minutes
 
 
 unsigned long st =0;
-uint8_t currentAnimation =  random(0,ANX);
+uint8_t currentAnimation = 26; // random(0,ANX);
 bool showTime = false;  // Tracks whether to show time or animation
 bool hasShownThisHour = false;  // Flag to prevent showing multiple times per hour
 
@@ -305,7 +307,7 @@ void loop() {
 
 
 /////////////////////////////
- //    currentAnimation =8;  //test
+ //   currentAnimation =26;  //test
 ///////////////////////////
 
 
@@ -316,6 +318,19 @@ void loop() {
         dma_display->clearScreen();
     } else {
         switch (currentAnimation) {
+
+            case 26:
+            
+            
+             glob();
+             
+            break;
+
+            case 27:
+            
+              glob2();
+            break;
+
             case 0:
              
                 updateFlame(&flame);

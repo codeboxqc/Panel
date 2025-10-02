@@ -634,9 +634,11 @@ void pageFlip() {
 
     // Create a lowercase copy of buftext
     char lowerText[256];
+
     for (int i = 0; i < 175 && buftext[i] != '\0'; i++) {
         if(buftext[i]=='\'') buftext[i]=' ';
-        if(buftext[i]=='—') buftext[i]=' ';
+
+
         lowerText[i] = tolower(buftext[i]);
         lowerText[i+1]= '\0';
     }

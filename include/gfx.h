@@ -88,6 +88,16 @@ extern Plasma plasma;
 void initFlame(Flame* f);
 void updateFlame(Flame* f);
 void drawFlame(Flame* f);
+void glob();
+void glob2();
+
+ int16_t getCos(uint16_t angle);
+ int16_t getSin(uint16_t angle);
+ 
+ 
+void calculateCurvePoint(float theta, float radius, int curveType, float *outX, float *outY);uint16_t hsvToRgb565(float h, float s, float v);
+float maper(float value, float inMin, float inMax, float outMin, float outMax) ;
+
 /////////////////////////////////////////////////////////////////
 
 void draw3DLineAnimations(unsigned long time) ;
