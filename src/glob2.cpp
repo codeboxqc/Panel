@@ -17,10 +17,7 @@
 #define FRAMESPERCFG 350
 #define ANGLEDIVISOR 6
 
-// Double buffer system
-//static uint16_t frontBuffer[WIDTH * HEIGHT];
-////static uint16_t backBuffer[WIDTH * HEIGHT];
-//static uint8_t bufferDirty = 0;  // Use uint8_t for bool
+ 
 
 // Cosine table from COSTBL.INC (signed 16-bit values)
 static const int16_t CosTbl2[1024] = {

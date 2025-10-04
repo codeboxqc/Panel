@@ -244,7 +244,7 @@ const unsigned long hourInterval = 58UL * 60UL * 1000UL;     // 60 minutes
 
 
 unsigned long st =0;
-uint8_t currentAnimation = 26; // random(0,ANX);
+uint8_t currentAnimation = 24; // random(0,ANX);
 bool showTime = false;  // Tracks whether to show time or animation
 bool hasShownThisHour = false;  // Flag to prevent showing multiple times per hour
 
@@ -267,6 +267,8 @@ void loop() {
             stateStartTime = now;
             currentAnimation = (currentAnimation + 1) % ANX; 
             hasShownThisHour = false;
+
+            if(random(0,5)==2) pacman();
              
         }
     } else {
@@ -299,7 +301,7 @@ void loop() {
         
        
        // bubble();
-       
+        if(random(0,5)==2) bubble();
         
         fade = 1.0f;
          Jets = 0.0f;
@@ -319,17 +321,14 @@ void loop() {
     } else {
         switch (currentAnimation) {
 
-            case 26:
+            case 24:
             
             
              glob();
-             
+             delay(2);
             break;
 
-            case 27:
-            
-              glob2();
-            break;
+             
 
             case 0:
              
@@ -453,8 +452,8 @@ void loop() {
                  break;
 
                  case 20:
-                pacman(); 
-                                   
+               
+                    glob2();                
                  break;
                   
                  case 21:
@@ -468,15 +467,13 @@ void loop() {
                   break; 
 
                   case 23:
-                   bubble();
-                  break; 
-                  case 24:
-                  updateSupercharged();
+                   updateSupercharged();
                   break; 
                   case 25:
-                     proverbe( );
-                     currentAnimation=0;
+                  proverbe( );
+                  currentAnimation=0;
                   break; 
+                 
 
             default:
                 // Fallback in case of invalid animation index

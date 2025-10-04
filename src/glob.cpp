@@ -16,7 +16,7 @@
 
 // Double buffer system
  
-//static uint8_t bufferDirty = 0;  // Use uint8_t for bool
+ 
 
 // Cosine table from COSTBL.INC (signed 16-bit values)
 static const int16_t CosTbl[1024] = {
