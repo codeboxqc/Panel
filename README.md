@@ -266,6 +266,10 @@ part need for this  DIY indoor P3 RGB module 192*192mm pixel 64*64 HUB75 Compati
 [https://www.aliexpress.com/p/order/index.html?spm=a2g0o.home.headerAcount.2.650c6278PyRpNx](https://www.aliexpress.com/item/1005007531631866.html?spm=a2g0o.order_list.order_list_main.5.3f7f18027b8KoF)
 
 
+
+https://github.com/user-attachments/assets/03bc9d28-cd3d-4c1a-9aca-805b0ef227e6
+
+
 Freenove ESP32-S3 ESP32 S3 Wireless Board, Dual-core 32-bit 240 MHz Microcontroller
 https://www.aliexpress.com/item/1005007758555205.html?spm=a2g0o.order_list.order_list_main.39.3f7f18027b8KoF
 Freenove Breakout Board for ESP32 / ESP32-S3 WROVER WROOM, Terminal Block Shield HAT, 5V 3.3V Power Outputs, GPIO Status LED
