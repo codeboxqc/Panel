@@ -283,3 +283,10 @@ https://www.aliexpress.com/item/1005005879655901.html?spm=a2g0o.order_list.order
 2 Female  To  Female    pawer from  Breakout Board to panel power up
 https://www.aliexpress.com/p/order/detail.html?spm=a2g0o.order_list.order_list_main.41.3f7f18027b8KoF&orderId=8204301001571878
 
+
+
+
+3 wired example how i do it!
+do same all wired
+
+![Untitled](https://github.com/user-attachments/assets/769a682f-24b9-4931-99e0-b728936e3f7d)
