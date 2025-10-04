@@ -267,6 +267,10 @@ part need for this  DIY indoor P3 RGB module 192*192mm pixel 64*64 HUB75 Compati
 
 
 
+https://github.com/user-attachments/assets/769eefad-66ba-4619-9dcc-b4506ec98e61
+
+
+
 https://github.com/user-attachments/assets/03bc9d28-cd3d-4c1a-9aca-805b0ef227e6
 
 
