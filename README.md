@@ -290,3 +290,7 @@ https://www.aliexpress.com/p/order/detail.html?spm=a2g0o.order_list.order_list_m
 do same all wired
 
 ![Untitled](https://github.com/user-attachments/assets/769a682f-24b9-4931-99e0-b728936e3f7d)
+
+
+
+contact https://bsky.app/profile/nutz.club/post/3m2eiyiro2k2k
