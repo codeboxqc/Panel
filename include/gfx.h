@@ -21,7 +21,7 @@
 //GPIO34–39 → input-only (not usable for HUB75 outputs).
 // ====================================================
  
-/*
+///* ESP32 S3 
 #define R1_PIN 17
 #define B1_PIN 8
 #define R2_PIN 3
@@ -39,12 +39,17 @@
 #define D_PIN 4
 #define LAT_PIN 6
 //grn pin
- */
+ //*/
  
  
-//*
+//
+/*
 
-
+////////////////////////////////////////////// 
+//esp32dev test oay with this pin  
+//in platformio.ini ;board = esp32dev
+//
+///////////////////////////////////////////////
 // Define HUB75 pins (your mapping)
  #define R1_PIN 25
 #define B1_PIN 26 
@@ -64,7 +69,8 @@
 #define LAT_PIN   21
 //grn pin
   
- //*/
+ //
+ */
  
 
  
@@ -264,11 +270,9 @@ extern unsigned char i7[2048] ;
 extern unsigned char i8[2048] ;
 extern unsigned char i9[2048] ;
 extern unsigned char i10[2048] ;
-extern unsigned char i11[2048] ;
-extern unsigned char i12[2048] ;
-extern unsigned char i13[2048] ;
-extern unsigned char i14[2048] ;
-extern unsigned char i15[2048] ;
+ 
+ 
+ 
 
 
   

@@ -205,10 +205,9 @@ void setup() {
 
  
  
-  //logo(); 
- 
- 
-
+ //logo(); 
+   
+   
 
  inittime();
  initFlame(&flame);
@@ -219,16 +218,8 @@ void setup() {
   initAsteroids();
  initSupercharged();
  
- 
-
-///dma_display->clearScreen();
- 
- 
-
-    bubble();
-   delay(1000);
-
- if(random(0,4)==1) proverbe( );
+  
+ //if(random(0,4)==1) proverbe( );
  
  
 }
@@ -240,7 +231,8 @@ void setup() {
 // ====================================================
 unsigned long stateStartTime = 0;
 const unsigned long showTimeDuration = 2UL * 60UL * 1000UL;  // 2 minutes
-const unsigned long animInterval = 7UL * 60UL * 1000UL;    //  7 minutes
+ const unsigned long animInterval = 4UL * 60UL * 1000UL;    //  4 minutes
+//const unsigned long animInterval = 2000;    //test
 const unsigned long hourInterval = 58UL * 60UL * 1000UL;     // 58 minutes
 ////////////////////////////////////////////////////////////////////////
 
@@ -248,7 +240,7 @@ const unsigned long hourInterval = 58UL * 60UL * 1000UL;     // 58 minutes
 
 
 unsigned long st =0;
-uint8_t currentAnimation = 24; // random(0,ANX);
+uint8_t currentAnimation =   random(0,ANX);
 bool showTime = false;  // Tracks whether to show time or animation
 bool hasShownThisHour = false;  // Flag to prevent showing multiple times per hour
 
@@ -272,7 +264,7 @@ void loop() {
             currentAnimation = (currentAnimation + 1) % ANX; 
             hasShownThisHour = false;
 
-            if(random(0,5)==2) pacman();
+           
              
         }
     } else {
@@ -305,7 +297,9 @@ void loop() {
         
        
        // bubble();
-        if(random(0,5)==2) bubble();
+       // if(random(0,4)==2) bubble();
+
+       // if(random(0,4)==2) pacman();
         
         fade = 1.0f;
          Jets = 0.0f;
@@ -313,7 +307,7 @@ void loop() {
 
 
 /////////////////////////////
- //   currentAnimation =26;  //test
+//  currentAnimation =0;  //test
 ///////////////////////////
 
 
@@ -496,11 +490,10 @@ void loop() {
  
 void bubble() {
 
-    unsigned char *images[] PROGMEM= {  i1, i2, i3, i4, i5, i6, i7, i8, i9, i10, i11, i12, i13, i14, i15 };
-
-    int bob = random(0, 14);  // Random index  image.cpp
-    dma_display->clearScreen();
-
+    unsigned char *images[] PROGMEM= {  i1, i2, i3, i4, i5, i6, i7, i8, i9, i10  };
+    int bob = random(0, 11);  // Random index  image.cpp
+    //dma_display->clearScreen();
+     clearTextBuffer(); 
     int q=0;
 
     if(q==0) putimage(0, 0, images[bob]);  // Display the selected image at (1, 1)
@@ -523,22 +516,21 @@ void bubble() {
 
 
 void pacman() {
-    int bob = random(0, 16); // Random image index
+    int bob = random(0, 11); // Random image index
     
 
-    unsigned char *images[] PROGMEM= {  i1, i2, i3, i4, i5, i6, i7, i8, i9, i10, i11, i12, i13, i14, i15 };
+    unsigned char *images[] PROGMEM= {  i1, i2, i3, i4, i5, i6, i7, i8, i9, i10  };
 
    
-
-    dma_display->clearScreen();
+    clearTextBuffer(); 
+    //dma_display->clearScreen();
         
       for(int x=-10;x<100;x++) {
         int ja=random(0,3);
         putimagesize(x, 20+ja, images[bob], 32);
         pageFlip();
-        delay(33);
- 
-        //dma_display->writeFillRect(x-1, 20+ja ,32,32,0x000);
+        clearTextBuffer(); 
+        
        
     }
     currentAnimation = (currentAnimation + 1) % ANX; 
