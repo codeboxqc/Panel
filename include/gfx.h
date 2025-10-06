@@ -12,6 +12,16 @@
 // ====================================================
 // HUB75 Panel Configuration
 // ====================================================
+
+
+
+// ====================================================
+//Avoid GPIOs 6–11 → connected to onboard flash.
+//Avoid strapping pins (GPIO0, 2, 15, 12) unless you know how boot modes work.
+//GPIO34–39 → input-only (not usable for HUB75 outputs).
+// ====================================================
+ 
+/*
 #define R1_PIN 17
 #define B1_PIN 8
 #define R2_PIN 3
@@ -20,15 +30,41 @@
 #define C_PIN 7
 #define CLK_PIN 5
 #define OE_PIN 12
+
 #define G1_PIN 18
+//grn pin
 #define G2_PIN 2
 #define E_PIN 13
 #define B_PIN 11
 #define D_PIN 4
 #define LAT_PIN 6
+//grn pin
+ */
+ 
+ 
+//*
 
 
+// Define HUB75 pins (your mapping)
+ #define R1_PIN 25
+#define B1_PIN 26 
+#define R2_PIN 27 
+#define B2_PIN 13
+#define A_PIN   23
+#define C_PIN   5
+#define CLK_PIN  14
+#define OE_PIN   32
 
+#define G1_PIN  33
+//grn pin 
+#define G2_PIN   12
+#define E_PIN   18  //(for 64px panels)	GPIO18 (optional)
+#define B_PIN  19
+#define D_PIN  22
+#define LAT_PIN   21
+//grn pin
+  
+ //*/
  
 
  

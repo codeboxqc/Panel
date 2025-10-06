@@ -112,11 +112,11 @@ void fbootPIN() {
  // Initialize first boot configuration
     int i=initFirstBoot();
     
-    // Wait for configuration to complete
+   //Wait for configuration to complete
     while (!isConfigComplete()) {
         if(i==1) break;
-         else handleFirstBoot();
-    }
+          else handleFirstBoot();
+     }
 
     if (dma_display != nullptr) {
         dma_display->clearScreen();
@@ -160,6 +160,7 @@ void setup() {
 
  ///*
    if(checkFirstBoot()==true) {
+ 
   
 
   // Configure HUB75 pins
@@ -189,42 +190,45 @@ void setup() {
   
   }
   delay(100);
-}
+ }
 //*/
  
-  //resetConfig();
+
+////////////////////////////////////////////////////////////////////
+//  resetConfig();
+////////////////////////////if wired fuck reset///////////////////
+ initTextBuffer();//init buffer first*************************
+ clearTextBuffer(); 
+
+  
+ fbootPIN();
 
  
+ 
+  //logo(); 
+ 
+ 
 
-  
-  fbootPIN();
-
-  
- logo();
-
-  
- initTextBuffer();//init buffer first*************************
- clearTextBuffer();
 
  inittime();
  initFlame(&flame);
  initPlasma(&plasma);
  initStarfield();
  initMatrixRain(&matrix);
- initParticleSystem();
- initAsteroids();
+  initParticleSystem();
+  initAsteroids();
  initSupercharged();
  
-
+ 
 
 ///dma_display->clearScreen();
  
-  //  textRenderingExample();
+ 
 
-  // bubble();
-  //  delay(5000);
+    bubble();
+   delay(1000);
 
-if(random(0,4)==1) proverbe( );
+ if(random(0,4)==1) proverbe( );
  
  
 }
@@ -236,8 +240,8 @@ if(random(0,4)==1) proverbe( );
 // ====================================================
 unsigned long stateStartTime = 0;
 const unsigned long showTimeDuration = 2UL * 60UL * 1000UL;  // 2 minutes
-const unsigned long animInterval = 7UL * 60UL * 1000UL;    //  6 minutes
-const unsigned long hourInterval = 58UL * 60UL * 1000UL;     // 60 minutes
+const unsigned long animInterval = 7UL * 60UL * 1000UL;    //  7 minutes
+const unsigned long hourInterval = 58UL * 60UL * 1000UL;     // 58 minutes
 ////////////////////////////////////////////////////////////////////////
 
 
@@ -257,7 +261,7 @@ void loop() {
 
 
    
- checkResetButton(); ///fast double click reset
+ //  checkResetButton(); ///fast double click reset
 
    
     if (!getLocalTime(&timeinfo)) {
